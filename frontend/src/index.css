@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply antialiased selection:bg-blue-600 selection:text-white;
+  }
+}
+
+/* Print styles for Tickets and Manifests */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  .no-print {
+    display: none !important;
+  }
+  .print-only {
+    display: block !important;
+  }
+  .card, .ticket-container {
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+}

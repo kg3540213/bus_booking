@@ -1,0 +1,25 @@
+{
+  "name": "algions-bus-booking-system",
+  "version": "1.0.0",
+  "description": "Algions AI Labs - Enterprise Bus Booking Management System",
+  "scripts": {
+    "start:backend": "npm --prefix backend start",
+    "start:frontend": "npm --prefix frontend dev",
+    "db:migrate": "npm --prefix backend run db:migrate",
+    "db:seed": "npm --prefix backend run db:seed",
+    "test": "npm --prefix backend test",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:logs": "docker compose logs -f"
+  },
+  "keywords": [
+    "bus-booking",
+    "algions",
+    "react",
+    "express",
+    "postgresql",
+    "docker"
+  ],
+  "author": "Algions AI Labs Assessment Candidate",
+  "license": "UNLICENSED"
+}
