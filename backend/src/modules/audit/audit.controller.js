@@ -43,3 +43,4 @@ async function getAuditLogs(req, res, next) {
 }
 
 module.exports = { getAuditLogs };
+

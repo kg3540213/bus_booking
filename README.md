@@ -125,3 +125,4 @@ Copy `.env.example` to `.env` if customizing connection settings:
 1. **Payment Gateway**: Integrates a realistic mock payment gateway simulation (UPI, Cards, NetBanking). Production deployment would integrate razorpay/stripe webhooks with idempotent event handlers.
 2. **SMS/Email Notifications**: Notification events are recorded in the audit trail. Integration with Twilio/SendGrid can be enabled via standard webhook triggers.
 3. **Multi-Currency**: Default currency is Indian Rupee (INR ₹), standard for domestic intercity bus transit.
+

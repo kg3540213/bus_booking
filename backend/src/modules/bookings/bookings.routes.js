@@ -13,3 +13,4 @@ router.get('/:id/cancellation-quote', requireAuth, bookingsController.previewCan
 router.post('/:id/cancel', requireAuth, bookingsController.cancelBooking);
 
 module.exports = router;
+

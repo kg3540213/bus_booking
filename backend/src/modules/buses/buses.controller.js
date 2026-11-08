@@ -171,3 +171,4 @@ async function createBus(req, res, next) {
 }
 
 module.exports = { getAllBuses, getBusById, createBus };
+

@@ -7,3 +7,4 @@ const { requireRole } = require('../../middleware/rbac');
 router.get('/', requireAuth, requireRole('ADMIN'), auditController.getAuditLogs);
 
 module.exports = router;
+

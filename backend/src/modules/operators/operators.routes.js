@@ -10,3 +10,4 @@ router.post('/', requireAuth, requireRole('ADMIN'), operatorsController.createOp
 router.put('/:id', requireAuth, requireRole('ADMIN', 'OPERATOR'), operatorsController.updateOperator);
 
 module.exports = router;
+

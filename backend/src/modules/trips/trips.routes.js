@@ -10,3 +10,4 @@ router.post('/', requireAuth, requireRole('ADMIN', 'OPERATOR'), tripsController.
 router.patch('/:id/status', requireAuth, requireRole('ADMIN', 'OPERATOR'), tripsController.updateTripStatus);
 
 module.exports = router;
+

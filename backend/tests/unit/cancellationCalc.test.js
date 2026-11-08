@@ -62,3 +62,4 @@ describe('Unit Tests: Cancellation and Refund Rules Engine', () => {
     expect(result.cancellationFee).toBe(1000);
   });
 });
+

@@ -76,3 +76,4 @@ function calculateCancellationRefund(departureTime, totalFare, policies = []) {
 }
 
 module.exports = { calculateCancellationRefund };
+

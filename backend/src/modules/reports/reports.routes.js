@@ -13,3 +13,4 @@ router.get('/occupancy', reportsController.getOccupancyReport);
 router.get('/trips/:tripId/manifest', reportsController.getTripPassengerManifest);
 
 module.exports = router;
+

@@ -37,3 +37,4 @@ async function logAuditTrail({
 }
 
 module.exports = { logAuditTrail };
+

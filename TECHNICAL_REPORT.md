@@ -168,3 +168,4 @@ When recording the submission walkthrough video, follow this concise script:
 | **Security**| Server-side RBAC & Customer 403 Forbidden checks | Verified |
 | **Docker**  | 1-command startup via `docker-compose up` | Verified |
 | **Swagger** | Interactive documentation at `/api/docs` | Verified |
+

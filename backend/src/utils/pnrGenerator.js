@@ -15,3 +15,4 @@ function generatePNR(prefix = 'ALG') {
 }
 
 module.exports = { generatePNR };
+

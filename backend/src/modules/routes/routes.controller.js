@@ -151,3 +151,4 @@ async function createRoute(req, res, next) {
 }
 
 module.exports = { getAllRoutes, getDistinctCities, getRouteById, createRoute };
+

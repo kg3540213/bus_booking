@@ -403,3 +403,4 @@ export default function SearchResults() {
     </div>
   );
 }
+

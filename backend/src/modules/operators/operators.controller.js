@@ -136,3 +136,4 @@ async function updateOperator(req, res, next) {
 }
 
 module.exports = { getAllOperators, getOperatorById, createOperator, updateOperator };
+

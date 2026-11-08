@@ -323,3 +323,4 @@ async function updateTripStatus(req, res, next) {
 }
 
 module.exports = { searchTrips, getTripById, createTrip, updateTripStatus };
+

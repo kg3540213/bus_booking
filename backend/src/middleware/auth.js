@@ -38,3 +38,4 @@ function optionalAuth(req, res, next) {
 }
 
 module.exports = { requireAuth, optionalAuth };
+

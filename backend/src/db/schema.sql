@@ -197,3 +197,4 @@ CREATE INDEX idx_bookings_user ON bookings(user_id);
 CREATE INDEX idx_bookings_trip ON bookings(trip_id);
 CREATE INDEX idx_bookings_pnr ON bookings(pnr);
 CREATE INDEX idx_audit_created ON audit_logs(created_at DESC);
+

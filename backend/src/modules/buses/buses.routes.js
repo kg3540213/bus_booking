@@ -9,3 +9,4 @@ router.get('/:id', busesController.getBusById);
 router.post('/', requireAuth, requireRole('ADMIN', 'OPERATOR'), busesController.createBus);
 
 module.exports = router;
+

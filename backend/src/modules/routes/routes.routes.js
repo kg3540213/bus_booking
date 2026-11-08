@@ -10,3 +10,4 @@ router.get('/:id', routesController.getRouteById);
 router.post('/', requireAuth, requireRole('ADMIN', 'OPERATOR'), routesController.createRoute);
 
 module.exports = router;
+

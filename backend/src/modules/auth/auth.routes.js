@@ -9,3 +9,4 @@ router.post('/demo-login', authController.demoLogin);
 router.get('/me', requireAuth, authController.getProfile);
 
 module.exports = router;
+
