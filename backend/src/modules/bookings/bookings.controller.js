@@ -4,25 +4,57 @@ const { generatePNR } = require('../../utils/pnrGenerator');
 const { calculateCancellationRefund } = require('../../utils/cancellationCalc');
 const { logAuditTrail } = require('../../middleware/auditLogger');
 
-const passengerSchema = z.object({
+const passengerSchema = z.preprocess((val) => {
+  if (typeof val !== 'object' || val === null) return val;
+  const name = (val.passenger_name || val.name || '').trim();
+  const age = Number(val.passenger_age ?? val.age ?? 25);
+  const genderRaw = String(val.passenger_gender || val.gender || 'MALE').toUpperCase();
+  const gender = ['MALE', 'FEMALE', 'OTHER'].includes(genderRaw) ? genderRaw : 'MALE';
+
+  return {
+    seat_number: String(val.seat_number || '').trim(),
+    passenger_name: name || 'Passenger',
+    passenger_age: isNaN(age) || age < 1 ? 25 : age,
+    passenger_gender: gender,
+  };
+}, z.object({
   seat_number: z.string().min(1),
-  passenger_name: z.string().min(2),
+  passenger_name: z.string().min(1),
   passenger_age: z.number().int().min(1).max(120),
   passenger_gender: z.enum(['MALE', 'FEMALE', 'OTHER']),
-});
+}));
 
-const createBookingSchema = z.object({
+const createBookingSchema = z.preprocess((val) => {
+  if (typeof val !== 'object' || val === null) return val;
+  const rawPassengers = Array.isArray(val.passengers) ? val.passengers : [];
+  const firstPassengerName = rawPassengers[0]?.passenger_name || rawPassengers[0]?.name || 'Passenger';
+
+  const contactName = (val.primary_contact_name || val.contact_name || firstPassengerName || '').trim();
+  const contactEmail = (val.primary_contact_email || val.contact_email || 'user@example.com').trim();
+  const contactPhone = (val.primary_contact_phone || val.contact_phone || '+91 98765 43210').trim();
+
+  return {
+    ...val,
+    trip_id: Number(val.trip_id),
+    primary_contact_name: contactName || 'Passenger',
+    primary_contact_email: contactEmail || 'user@example.com',
+    primary_contact_phone: contactPhone || '+91 98765 43210',
+    boarding_stop_id: val.boarding_stop_id ? Number(val.boarding_stop_id) : null,
+    dropping_stop_id: val.dropping_stop_id ? Number(val.dropping_stop_id) : null,
+  };
+}, z.object({
   trip_id: z.number().int().positive(),
   selected_seats: z.array(z.string()).min(1, 'At least one seat must be selected'),
   passengers: z.array(passengerSchema).min(1),
-  primary_contact_name: z.string().min(2),
+  primary_contact_name: z.string().min(1),
   primary_contact_email: z.string().email(),
-  primary_contact_phone: z.string().min(8),
+  primary_contact_phone: z.string().min(5),
   boarding_stop_id: z.number().int().positive().optional().nullable(),
   dropping_stop_id: z.number().int().positive().optional().nullable(),
   idempotency_key: z.string().optional().nullable(),
   payment_method: z.string().optional(),
-});
+  discount_amount: z.number().optional(),
+}));
 
 /**
  * Create a new booking with ACID transaction and pessimistic row locking

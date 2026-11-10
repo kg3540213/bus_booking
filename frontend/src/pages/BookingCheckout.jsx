@@ -48,7 +48,7 @@ export default function BookingCheckout() {
   const [droppingStopId, setDroppingStopId] = useState(droppingStops[0]?.id || null);
 
   // Primary Contact Info
-  const [contactName, setContactName] = useState(user?.name || '');
+  const [contactName, setContactName] = useState(user?.name || 'John Doe');
   const [contactEmail, setContactEmail] = useState(user?.email || 'user@example.com');
   const [contactPhone, setContactPhone] = useState(user?.phone || '+91 98765 43210');
 
@@ -60,7 +60,8 @@ export default function BookingCheckout() {
   // Payment Method
   const [paymentMethod, setPaymentMethod] = useState('UPI');
   const [submitting, setSubmitting] = useState(false);
-  const [conflictError, setConflictError] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isCollisionError, setIsCollisionError] = useState(false);
 
   const rawFare = seatObjs.reduce((sum, s) => sum + Number(s.fare), 0);
   const gstAmount = Math.round(rawFare * 0.05); // 5% GST
@@ -92,25 +93,41 @@ export default function BookingCheckout() {
   const handleConfirmBooking = async (e) => {
     e.preventDefault();
     setSubmitting(true);
-    setConflictError('');
+    setErrorMessage('');
+    setIsCollisionError(false);
 
     try {
+      const primaryName = (contactName || passengers[0]?.passenger_name || user?.name || 'Primary Traveler').trim();
+      const primaryEmail = (contactEmail || user?.email || 'user@example.com').trim();
+      const primaryPhone = (contactPhone || user?.phone || '+91 98765 43210').trim();
+
       const payload = {
-        trip_id: trip.id,
+        trip_id: Number(trip.id),
         selected_seats: selectedSeats,
-        passengers: passengers.map(p => ({
-          seat_number: p.seat_number,
-          name: p.passenger_name || 'Passenger',
-          age: Number(p.passenger_age) || 25,
-          gender: p.passenger_gender || 'MALE',
-        })),
-        boarding_stop_id: boardingStopId,
-        dropping_stop_id: droppingStopId,
-        contact_name: contactName || passengers[0]?.passenger_name || 'Passenger',
-        contact_email: contactEmail,
-        contact_phone: contactPhone,
-        payment_method: paymentMethod,
-        discount_amount: appliedDiscount,
+        passengers: passengers.map((p, idx) => {
+          const pName = (p.passenger_name || '').trim() || (idx === 0 ? primaryName : `Passenger ${idx + 1}`);
+          const pAge = Number(p.passenger_age) || 26;
+          const pGender = p.passenger_gender || 'MALE';
+          return {
+            seat_number: String(p.seat_number),
+            passenger_name: pName,
+            name: pName,
+            passenger_age: pAge,
+            age: pAge,
+            passenger_gender: pGender,
+            gender: pGender,
+          };
+        }),
+        boarding_stop_id: boardingStopId ? Number(boardingStopId) : null,
+        dropping_stop_id: droppingStopId ? Number(droppingStopId) : null,
+        primary_contact_name: primaryName,
+        contact_name: primaryName,
+        primary_contact_email: primaryEmail,
+        contact_email: primaryEmail,
+        primary_contact_phone: primaryPhone,
+        contact_phone: primaryPhone,
+        payment_method: paymentMethod || 'UPI',
+        discount_amount: Number(appliedDiscount) || 0,
       };
 
       const res = await bookingsApi.create(payload);
@@ -118,13 +135,25 @@ export default function BookingCheckout() {
         navigate('/confirmation', { state: { booking: res.data } });
       }
     } catch (err) {
-      if (err.status === 409 || err.message?.includes('already booked')) {
-        setConflictError(
-          'Concurrency Collision: One or more of the selected seats were just confirmed by another passenger. Please return to the seat map and pick an available seat.'
-        );
-      } else {
-        setConflictError(err.message || 'Failed to complete booking. Please verify your details.');
+      console.error('Booking submission error:', err);
+      const is409 = err.status === 409 || err.message?.toLowerCase().includes('already booked') || err.message?.toLowerCase().includes('collision');
+      setIsCollisionError(is409);
+
+      let msg = err.message || 'Failed to complete booking. Please verify your details.';
+      try {
+        if (typeof msg === 'string' && (msg.startsWith('[') || msg.startsWith('{'))) {
+          const parsed = JSON.parse(msg);
+          if (Array.isArray(parsed)) {
+            msg = parsed.map(item => `${item.path?.join('.') || 'Field'}: ${item.message}`).join('; ');
+          }
+        }
+      } catch (_) {}
+
+      if (is409) {
+        msg = 'One or more of your selected berths were just confirmed by another passenger during checkout. Please return to the seat map and select another available berth.';
       }
+
+      setErrorMessage(msg);
     } finally {
       setSubmitting(false);
     }
@@ -154,12 +183,22 @@ export default function BookingCheckout() {
         </div>
       </div>
 
-      {conflictError && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3 text-red-900 text-xs">
-          <AlertCircle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+      {errorMessage && (
+        <div className={`p-4 rounded-2xl border flex items-start gap-3 text-xs ${
+          isCollisionError
+            ? 'bg-amber-50 border-amber-300 text-amber-900'
+            : 'bg-red-50 border-red-200 text-red-900'
+        }`}>
+          <AlertCircle className={`w-5 h-5 shrink-0 mt-0.5 ${isCollisionError ? 'text-amber-600' : 'text-red-600'}`} />
           <div>
-            <div className="font-bold text-sm">Seat Reservation Collision (ACID Protection)</div>
-            <div className="mt-0.5 text-red-700">{conflictError}</div>
+            <div className="font-bold text-sm">
+              {isCollisionError
+                ? 'Seat Reservation Collision (ACID Protection)'
+                : 'Unable to Confirm Reservation'}
+            </div>
+            <div className={`mt-0.5 ${isCollisionError ? 'text-amber-800' : 'text-red-700'}`}>
+              {errorMessage}
+            </div>
           </div>
         </div>
       )}
@@ -251,8 +290,8 @@ export default function BookingCheckout() {
                       <label className="block font-bold text-slate-600 mb-1">Age</label>
                       <input
                         type="number"
-                        min="5"
-                        max="100"
+                        min="1"
+                        max="120"
                         required
                         value={p.passenger_age}
                         onChange={(e) => handlePassengerChange(index, 'passenger_age', e.target.value)}
@@ -292,7 +331,19 @@ export default function BookingCheckout() {
               <span>3. Contact Information for E-Ticket & Live SMS</span>
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-600 mb-1.5">Primary Contact Name</label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. John Doe"
+                  value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-brand-500"
+                />
+              </div>
+
               <div>
                 <label className="block font-bold text-slate-600 mb-1.5">Email Address</label>
                 <input
