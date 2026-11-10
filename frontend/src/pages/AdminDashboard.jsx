@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   Shield, Bus, MapPin, Calendar, Users, DollarSign,
-  TrendingUp, Plus, Activity, CheckCircle, RefreshCw, AlertCircle
+  TrendingUp, Plus, Activity, CheckCircle, RefreshCw, AlertCircle, FileText
 } from 'lucide-react';
 import { reportsApi, auditApi, busesApi, routesApi, operatorsApi, tripsApi } from '../services/api';
 
@@ -88,7 +88,7 @@ export default function AdminDashboard() {
         loadDashboardData();
       }
     } catch (err) {
-      alert('Error creating bus: ' + err.message);
+      alert('Error registering bus: ' + err.message);
     }
   };
 
@@ -118,15 +118,15 @@ export default function AdminDashboard() {
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 flex items-center gap-1">
-              <Shield className="w-3.5 h-3.5" /> Staff & Admin Portal
+            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-purple-100 text-purple-800 flex items-center gap-1 border border-purple-200">
+              <Shield className="w-3.5 h-3.5" /> NexBus Central Administration Console
             </span>
           </div>
           <h1 className="text-3xl font-black text-slate-900 tracking-tight mt-1">
-            System Administration Console
+            System Administration & Control Center
           </h1>
           <p className="text-xs text-slate-500">
-            Full operational management of operators, fleet buses, routes, schedules, occupancy, and audit trail.
+            Real-time management of operators, fleet vehicles, schedules, occupancy reports, and immutable audit logs.
           </p>
         </div>
 
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
           onClick={loadDashboardData}
           className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-2 transition"
         >
-          <RefreshCw className="w-3.5 h-3.5" /> Refresh Data
+          <RefreshCw className="w-3.5 h-3.5" /> Refresh Console
         </button>
       </div>
 
@@ -172,19 +172,19 @@ export default function AdminDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
               <div className="flex justify-between items-start">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Gross Bookings Revenue</span>
-                <span className="p-2 bg-emerald-50 text-emerald-600 rounded-xl">₹</span>
+                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Gross Booking Revenue</span>
+                <span className="p-2 bg-emerald-50 text-emerald-600 rounded-xl font-bold">₹</span>
               </div>
               <div className="text-2xl font-black text-slate-900 mt-2 font-mono">
                 ₹{summary?.gross_revenue?.toLocaleString() || 0}
               </div>
-              <div className="text-[11px] text-emerald-600 font-semibold mt-1">Confirmed transactions</div>
+              <div className="text-[11px] text-emerald-600 font-bold mt-1">Confirmed transactions</div>
             </div>
 
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
               <div className="flex justify-between items-start">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Net Realized Revenue</span>
-                <span className="p-2 bg-blue-50 text-blue-600 rounded-xl">₹</span>
+                <span className="p-2 bg-blue-50 text-blue-600 rounded-xl font-bold">₹</span>
               </div>
               <div className="text-2xl font-black text-blue-600 mt-2 font-mono">
                 ₹{summary?.net_revenue?.toLocaleString() || 0}
@@ -215,18 +215,18 @@ export default function AdminDashboard() {
               <div className="text-2xl font-black text-slate-900 mt-2">
                 {summary?.total_buses || 0} Buses
               </div>
-              <div className="text-[11px] text-purple-600 font-semibold mt-1">
+              <div className="text-[11px] text-purple-600 font-bold mt-1">
                 {summary?.total_trips || 0} active schedules
               </div>
             </div>
           </div>
 
           {/* Recent Bookings Feed */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-4">
             <h3 className="font-bold text-slate-900 text-sm">Recent Real-Time Bookings Feed</h3>
-            <div className="overflow-x-auto rounded-xl border border-slate-100">
+            <div className="overflow-x-auto rounded-2xl border border-slate-100">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
                   <tr>
                     <th className="py-2.5 px-4">PNR</th>
                     <th className="py-2.5 px-4">Passenger Contact</th>
@@ -241,7 +241,7 @@ export default function AdminDashboard() {
                   {recentBookings.map(b => (
                     <tr key={b.id} className="hover:bg-slate-50">
                       <td className="py-2.5 px-4 font-mono font-bold text-blue-600">{b.pnr}</td>
-                      <td className="py-2.5 px-4 font-semibold text-slate-900">{b.primary_contact_name}</td>
+                      <td className="py-2.5 px-4 font-bold text-slate-900">{b.primary_contact_name}</td>
                       <td className="py-2.5 px-4">{b.source_city} → {b.destination_city}</td>
                       <td className="py-2.5 px-4 text-slate-500">{b.operator_name}</td>
                       <td className="py-2.5 px-4 font-bold font-mono">₹{Math.round(b.total_fare)}</td>
@@ -266,28 +266,28 @@ export default function AdminDashboard() {
       {activeTab === 'operators' && (
         <div className="space-y-8 animate-in fade-in">
           {/* Operators */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-4">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <h3 className="font-bold text-slate-900 text-base">Bus Operators ({operators.length})</h3>
+              <h3 className="font-bold text-slate-900 text-base">Registered Bus Operators ({operators.length})</h3>
               <button
                 onClick={() => setShowAddOperator(true)}
-                className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition"
+                className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-xs"
               >
-                <Plus className="w-3.5 h-3.5" /> Add Operator
+                <Plus className="w-3.5 h-3.5" /> Add Operator Company
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {operators.map(op => (
-                <div key={op.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                <div key={op.id} className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
                   <div className="flex justify-between items-start">
                     <span className="font-black text-slate-900 text-sm">{op.name}</span>
                     <span className="px-2 py-0.5 bg-slate-200 rounded text-[10px] font-mono font-bold">{op.code}</span>
                   </div>
                   <div className="text-xs text-slate-500">{op.contact_email} • {op.contact_phone}</div>
                   <div className="text-[11px] text-slate-400">{op.address}</div>
-                  <div className="pt-2 border-t border-slate-200 text-xs font-semibold text-blue-600">
-                    {op.total_buses || 0} Fleet Vehicles Assigned
+                  <div className="pt-2 border-t border-slate-200 text-xs font-bold text-blue-600">
+                    {op.total_buses || 0} Registered Coaches
                   </div>
                 </div>
               ))}
@@ -295,20 +295,20 @@ export default function AdminDashboard() {
           </div>
 
           {/* Fleet Vehicles */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-4">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
               <h3 className="font-bold text-slate-900 text-base">Fleet Buses ({buses.length})</h3>
               <button
                 onClick={() => setShowAddBus(true)}
-                className="px-3 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition"
+                className="px-3.5 py-1.5 bg-purple-600 hover:bg-purple-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-xs"
               >
-                <Plus className="w-3.5 h-3.5" /> Register Bus
+                <Plus className="w-3.5 h-3.5" /> Register Fleet Vehicle
               </button>
             </div>
 
-            <div className="overflow-x-auto rounded-xl border border-slate-100">
+            <div className="overflow-x-auto rounded-2xl border border-slate-100">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+                <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
                   <tr>
                     <th className="py-2.5 px-4">Bus Registration</th>
                     <th className="py-2.5 px-4">Model</th>
@@ -321,15 +321,15 @@ export default function AdminDashboard() {
                 <tbody className="divide-y divide-slate-100 text-slate-700">
                   {buses.map(b => (
                     <tr key={b.id} className="hover:bg-slate-50">
-                      <td className="py-2.5 px-4 font-mono font-bold text-slate-900">{b.bus_number}</td>
-                      <td className="py-2.5 px-4 font-semibold">{b.model}</td>
+                      <td className="py-2.5 px-4 font-mono font-black text-slate-900">{b.bus_number}</td>
+                      <td className="py-2.5 px-4 font-bold">{b.model}</td>
                       <td className="py-2.5 px-4 text-slate-500">{b.operator_name}</td>
                       <td className="py-2.5 px-4">
-                        <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded font-semibold text-[10px]">
+                        <span className="px-2 py-0.5 bg-blue-50 text-blue-700 rounded font-bold text-[10px]">
                           {b.bus_type}
                         </span>
                       </td>
-                      <td className="py-2.5 px-4 font-mono">{b.total_seats} berths</td>
+                      <td className="py-2.5 px-4 font-mono font-bold">{b.total_seats} berths</td>
                       <td className="py-2.5 px-4">
                         <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold text-[10px]">
                           {b.status}
@@ -347,20 +347,20 @@ export default function AdminDashboard() {
       {/* Tab 3: Routes & Schedules */}
       {activeTab === 'routes' && (
         <div className="space-y-8 animate-in fade-in">
-          <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+          <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-4">
             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-              <h3 className="font-bold text-slate-900 text-base">Active Routes ({routes.length})</h3>
+              <h3 className="font-bold text-slate-900 text-base">Active Travel Corridors ({routes.length})</h3>
               <button
                 onClick={() => setShowAddTrip(true)}
-                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition"
+                className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-xs"
               >
-                <Plus className="w-3.5 h-3.5" /> Schedule New Trip
+                <Plus className="w-3.5 h-3.5" /> Schedule New Departure
               </button>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {routes.map(r => (
-                <div key={r.id} className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
+                <div key={r.id} className="p-5 bg-slate-50 rounded-2xl border border-slate-200 space-y-2">
                   <div className="flex justify-between items-start">
                     <span className="font-black text-slate-900 text-sm">
                       {r.source_city} → {r.destination_city}
@@ -391,19 +391,17 @@ export default function AdminDashboard() {
 
       {/* Tab 4: Fleet Occupancy Reports */}
       {activeTab === 'occupancy' && (
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4 animate-in fade-in">
-          <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-            <div>
-              <h3 className="font-bold text-slate-900 text-base">Fleet Capacity & Occupancy Utilization Report</h3>
-              <p className="text-xs text-slate-500">Live seat bookings reconciled against vehicle capacities</p>
-            </div>
+        <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-4 animate-in fade-in">
+          <div>
+            <h3 className="font-bold text-slate-900 text-base">Fleet Capacity & Occupancy Utilization Report</h3>
+            <p className="text-xs text-slate-500">Live seat bookings reconciled against vehicle capacities</p>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-100">
+          <div className="overflow-x-auto rounded-2xl border border-slate-100">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
                 <tr>
-                  <th className="py-2.5 px-4">Trip Schedule</th>
+                  <th className="py-2.5 px-4">Departure Time</th>
                   <th className="py-2.5 px-4">Route</th>
                   <th className="py-2.5 px-4">Bus & Coach</th>
                   <th className="py-2.5 px-4">Operator</th>
@@ -415,11 +413,11 @@ export default function AdminDashboard() {
               <tbody className="divide-y divide-slate-100 text-slate-700">
                 {occupancy.map(occ => (
                   <tr key={occ.trip_id} className="hover:bg-slate-50">
-                    <td className="py-2.5 px-4 font-semibold text-slate-900">
+                    <td className="py-2.5 px-4 font-bold text-slate-900">
                       {new Date(occ.departure_time).toLocaleString([], { dateStyle: 'short', timeStyle: 'short' })}
                     </td>
                     <td className="py-2.5 px-4">{occ.source_city} → {occ.destination_city}</td>
-                    <td className="py-2.5 px-4 font-mono">{occ.bus_number} ({occ.bus_type})</td>
+                    <td className="py-2.5 px-4 font-mono font-bold">{occ.bus_number} ({occ.bus_type})</td>
                     <td className="py-2.5 px-4 text-slate-500">{occ.operator_name}</td>
                     <td className="py-2.5 px-4 font-bold">
                       <span className="text-blue-600">{occ.booked_seats}</span> / {occ.total_seats}
@@ -451,15 +449,15 @@ export default function AdminDashboard() {
 
       {/* Tab 5: Audit Trail */}
       {activeTab === 'audit' && (
-        <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4 animate-in fade-in">
+        <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-sm space-y-4 animate-in fade-in">
           <div>
             <h3 className="font-bold text-slate-900 text-base">Material Business Action Audit Trail</h3>
-            <p className="text-xs text-slate-500">Immutable log of security-sensitive operations, bookings, cancellations and modifications</p>
+            <p className="text-xs text-slate-500">Immutable ledger of security-sensitive operations, bookings, cancellations and modifications</p>
           </div>
 
-          <div className="overflow-x-auto rounded-xl border border-slate-100">
+          <div className="overflow-x-auto rounded-2xl border border-slate-100">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
+              <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
                 <tr>
                   <th className="py-2.5 px-4">Timestamp</th>
                   <th className="py-2.5 px-4">Action</th>
@@ -503,7 +501,7 @@ export default function AdminDashboard() {
       {showAddOperator && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <h3 className="font-bold text-slate-900 text-base">Register New Bus Operator</h3>
+            <h3 className="font-bold text-slate-900 text-base">Register New Bus Operator Company</h3>
             <form onSubmit={handleCreateOperator} className="space-y-3 text-xs">
               <div>
                 <label className="block font-bold text-slate-600 mb-1">Operator Name</label>
@@ -513,7 +511,7 @@ export default function AdminDashboard() {
                   placeholder="e.g. Royal Cruiser Lines"
                   value={newOp.name}
                   onChange={(e) => setNewOp({ ...newOp, name: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
                 />
               </div>
               <div className="grid grid-cols-2 gap-2">
@@ -525,7 +523,7 @@ export default function AdminDashboard() {
                     placeholder="e.g. RCL"
                     value={newOp.code}
                     onChange={(e) => setNewOp({ ...newOp, code: e.target.value.toUpperCase() })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 uppercase"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 uppercase font-mono font-bold"
                   />
                 </div>
                 <div>
@@ -536,7 +534,7 @@ export default function AdminDashboard() {
                     placeholder="+91 98765 00000"
                     value={newOp.contact_phone}
                     onChange={(e) => setNewOp({ ...newOp, contact_phone: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
                   />
                 </div>
               </div>
@@ -548,30 +546,30 @@ export default function AdminDashboard() {
                   placeholder="ops@operator.com"
                   value={newOp.contact_email}
                   onChange={(e) => setNewOp({ ...newOp, contact_email: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
                 />
               </div>
               <div>
-                <label className="block font-bold text-slate-600 mb-1">Address / HQ</label>
+                <label className="block font-bold text-slate-600 mb-1">HQ City / Depot Address</label>
                 <input
                   type="text"
-                  placeholder="City, State"
+                  placeholder="e.g. Mumbai Central Depot"
                   value={newOp.address}
                   onChange={(e) => setNewOp({ ...newOp, address: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
                 />
               </div>
               <div className="flex gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAddOperator(false)}
-                  className="flex-1 py-2 bg-slate-100 rounded-xl font-bold text-slate-700"
+                  className="flex-1 py-2.5 bg-slate-100 rounded-xl font-bold text-slate-700"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 bg-blue-600 text-white rounded-xl font-bold"
+                  className="flex-1 py-2.5 bg-blue-600 text-white rounded-xl font-bold"
                 >
                   Save Operator
                 </button>
@@ -585,14 +583,14 @@ export default function AdminDashboard() {
       {showAddBus && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <h3 className="font-bold text-slate-900 text-base">Register Fleet Bus</h3>
+            <h3 className="font-bold text-slate-900 text-base">Register Fleet Vehicle</h3>
             <form onSubmit={handleCreateBus} className="space-y-3 text-xs">
               <div>
                 <label className="block font-bold text-slate-600 mb-1">Operator</label>
                 <select
                   value={newBus.operator_id}
                   onChange={(e) => setNewBus({ ...newBus, operator_id: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold"
                 >
                   {operators.map(op => (
                     <option key={op.id} value={op.id}>{op.name} ({op.code})</option>
@@ -601,25 +599,25 @@ export default function AdminDashboard() {
               </div>
               <div className="grid grid-cols-2 gap-2">
                 <div>
-                  <label className="block font-bold text-slate-600 mb-1">Registration No.</label>
+                  <label className="block font-bold text-slate-600 mb-1">Plate Number</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. KA-01-EQ-9900"
+                    placeholder="e.g. KA-01-NB-9900"
                     value={newBus.bus_number}
                     onChange={(e) => setNewBus({ ...newBus, bus_number: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 uppercase"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 uppercase font-mono font-bold"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-600 mb-1">Model</label>
+                  <label className="block font-bold text-slate-600 mb-1">Bus Model</label>
                   <input
                     type="text"
                     required
-                    placeholder="Volvo 9600"
+                    placeholder="Volvo 9600 Multi-Axle"
                     value={newBus.model}
                     onChange={(e) => setNewBus({ ...newBus, model: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
                   />
                 </div>
               </div>
@@ -629,7 +627,7 @@ export default function AdminDashboard() {
                   <select
                     value={newBus.bus_type}
                     onChange={(e) => setNewBus({ ...newBus, bus_type: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold"
                   >
                     <option value="AC_SLEEPER">AC Sleeper 2+1</option>
                     <option value="AC_SEATER">AC Seater 2+2</option>
@@ -637,7 +635,7 @@ export default function AdminDashboard() {
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-600 mb-1">Total Seats</label>
+                  <label className="block font-bold text-slate-600 mb-1">Total Berths / Seats</label>
                   <input
                     type="number"
                     required
@@ -645,7 +643,7 @@ export default function AdminDashboard() {
                     max="60"
                     value={newBus.total_seats}
                     onChange={(e) => setNewBus({ ...newBus, total_seats: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono font-bold"
                   />
                 </div>
               </div>
@@ -656,13 +654,13 @@ export default function AdminDashboard() {
                 <button
                   type="button"
                   onClick={() => setShowAddBus(false)}
-                  className="flex-1 py-2 bg-slate-100 rounded-xl font-bold text-slate-700"
+                  className="flex-1 py-2.5 bg-slate-100 rounded-xl font-bold text-slate-700"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 bg-purple-600 text-white rounded-xl font-bold"
+                  className="flex-1 py-2.5 bg-purple-600 text-white rounded-xl font-bold"
                 >
                   Register Bus
                 </button>
@@ -676,14 +674,14 @@ export default function AdminDashboard() {
       {showAddTrip && (
         <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <h3 className="font-bold text-slate-900 text-base">Schedule New Trip</h3>
+            <h3 className="font-bold text-slate-900 text-base">Schedule New Bus Departure</h3>
             <form onSubmit={handleCreateTrip} className="space-y-3 text-xs">
               <div>
                 <label className="block font-bold text-slate-600 mb-1">Select Bus</label>
                 <select
                   value={newTrip.bus_id}
                   onChange={(e) => setNewTrip({ ...newTrip, bus_id: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
                 >
                   {buses.map(b => (
                     <option key={b.id} value={b.id}>{b.bus_number} - {b.model} ({b.operator_name})</option>
@@ -695,7 +693,7 @@ export default function AdminDashboard() {
                 <select
                   value={newTrip.route_id}
                   onChange={(e) => setNewTrip({ ...newTrip, route_id: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
                 >
                   {routes.map(r => (
                     <option key={r.id} value={r.id}>{r.source_city} → {r.destination_city} ({r.distance_km} km)</option>
@@ -709,7 +707,7 @@ export default function AdminDashboard() {
                   required
                   value={newTrip.departure_time}
                   onChange={(e) => setNewTrip({ ...newTrip, departure_time: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
                 />
               </div>
               <div>
@@ -719,31 +717,31 @@ export default function AdminDashboard() {
                   required
                   value={newTrip.arrival_time}
                   onChange={(e) => setNewTrip({ ...newTrip, arrival_time: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium"
                 />
               </div>
               <div>
-                <label className="block font-bold text-slate-600 mb-1">Base Seat Fare (₹)</label>
+                <label className="block font-bold text-slate-600 mb-1">Base Berth Fare (₹)</label>
                 <input
                   type="number"
                   required
                   min="100"
                   value={newTrip.base_fare}
                   onChange={(e) => setNewTrip({ ...newTrip, base_fare: e.target.value })}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-mono font-bold"
                 />
               </div>
               <div className="flex gap-2 pt-2">
                 <button
                   type="button"
                   onClick={() => setShowAddTrip(false)}
-                  className="flex-1 py-2 bg-slate-100 rounded-xl font-bold text-slate-700"
+                  className="flex-1 py-2.5 bg-slate-100 rounded-xl font-bold text-slate-700"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="flex-1 py-2 bg-emerald-600 text-white rounded-xl font-bold"
+                  className="flex-1 py-2.5 bg-emerald-600 text-white rounded-xl font-bold"
                 >
                   Publish Schedule
                 </button>
@@ -755,4 +753,3 @@ export default function AdminDashboard() {
     </div>
   );
 }
-

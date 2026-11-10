@@ -33,7 +33,7 @@ services:
       DB_USER: ${DB_USER:-bus_admin}
       DB_PASSWORD: ${DB_PASSWORD:-bus_secure_pass}
       DB_NAME: ${DB_NAME:-bus_booking_db}
-      JWT_SECRET: ${JWT_SECRET:-super_secret_jwt_key_algions_bus_2026}
+      JWT_SECRET: ${JWT_SECRET:-nexbus_jwt_secure_key_2026_enterprise}
       JWT_EXPIRES_IN: 24h
       CLIENT_URL: http://localhost:3000
     depends_on:
@@ -53,4 +53,3 @@ services:
 
 volumes:
   pgdata:
-

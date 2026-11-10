@@ -71,7 +71,7 @@ The platform includes a **1-Click Reviewer Role Switcher** in the top navigation
 
 | Role | Email | Password | Access Scope |
 |:---|:---|:---|:---|
-| **System Admin** | `admin@algions.com` | `Admin@123` | Full administrative control: operators, buses, routes, schedules, all manifests, and immutable audit logs. |
+| **System Admin** | `admin@nexbus.com` | `Admin@123` | Full administrative control: operators, buses, routes, schedules, all manifests, and immutable audit logs. |
 | **Operator Staff** | `operator@intercity.com` | `Operator@123` | Assigned operator portal: trip schedules, real-time passenger manifests, conductor check-in, and occupancy reconciliation. |
 | **Customer Passenger** | `user@example.com` | `User@123` | Passenger journey: search buses, select seats, book tickets, download boarding pass, and cancel tickets with refund calculator. |
 
@@ -115,7 +115,7 @@ Copy `.env.example` to `.env` if customizing connection settings:
 | `DB_PASSWORD` | `bus_secure_pass` | Database password |
 | `DB_NAME` | `bus_booking_db` | Database name |
 | `PORT` | `5000` | Backend API port |
-| `JWT_SECRET` | `super_secret_jwt_key_algions_bus_2026` | Secret key for signing authentication tokens |
+| `JWT_SECRET` | `nexbus_jwt_secure_key_2026_enterprise` | Secret key for signing authentication tokens |
 | `CLIENT_URL` | `http://localhost:3000` | Client origin allowed by CORS middleware |
 
 ---

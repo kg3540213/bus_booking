@@ -25,13 +25,13 @@ async function seedDatabase() {
     const opRes = await client.query(`
       INSERT INTO operators (name, code, contact_email, contact_phone, address, status)
       VALUES
-        ('Algions Express Travels', 'ALG', 'ops@algionstravels.com', '+91 98765 00001', 'Koramangala, Bangalore, Karnataka', 'ACTIVE'),
+        ('NexBus Premier Travels', 'NBX', 'ops@nexbustravels.com', '+91 98765 00001', 'Koramangala Transit Hub, Bangalore, Karnataka', 'ACTIVE'),
         ('Southern Star Superlines', 'SSL', 'ops@southernstar.com', '+91 98765 00002', 'Hitech City, Hyderabad, Telangana', 'ACTIVE'),
         ('Royal Cruiser Lines', 'RCL', 'ops@royalcruiser.com', '+91 98765 00003', 'Andheri East, Mumbai, Maharashtra', 'ACTIVE')
       RETURNING id, name, code;
     `);
 
-    const opAlgionsId = opRes.rows.find(r => r.code === 'ALG').id;
+    const opNexBusId = opRes.rows.find(r => r.code === 'NBX').id;
     const opStarId = opRes.rows.find(r => r.code === 'SSL').id;
     const opRoyalId = opRes.rows.find(r => r.code === 'RCL').id;
 
@@ -45,30 +45,30 @@ async function seedDatabase() {
     await client.query(`
       INSERT INTO users (name, email, password_hash, phone, role, operator_id)
       VALUES
-        ('Algions System Admin', 'admin@algions.com', $1, '+91 99999 11111', 'ADMIN', NULL),
-        ('Algions Fleet Manager', 'operator@intercity.com', $2, '+91 99999 22222', 'OPERATOR', $4),
+        ('NexBus System Administrator', 'admin@nexbus.com', $1, '+91 99999 11111', 'ADMIN', NULL),
+        ('Intercity Fleet Dispatcher', 'operator@intercity.com', $2, '+91 99999 22222', 'OPERATOR', $4),
         ('John Doe Passenger', 'user@example.com', $3, '+91 99999 33333', 'CUSTOMER', NULL),
         ('Priya Sharma Passenger', 'priya@example.com', $3, '+91 99999 44444', 'CUSTOMER', NULL)
-    `, [adminPass, opPass, userPass, opAlgionsId]);
+    `, [adminPass, opPass, userPass, opNexBusId]);
 
     // 4. Fleet Buses
     console.log('Seeding buses...');
     const busRes = await client.query(`
       INSERT INTO buses (operator_id, bus_number, model, bus_type, total_seats, amenities, status)
       VALUES
-        ($1, 'KA-01-AG-2026', 'Volvo 9600 Multi-Axle Luxury Sleeper', 'AC_SLEEPER', 30, 
-         '["AC", "WiFi", "Charging Point", "Blanket", "Water Bottle", "Reading Light", "Emergency Exit"]'::jsonb, 'ACTIVE'),
-        ($1, 'KA-01-AG-5050', 'Scania Metrolink Multi-Axle High Deck', 'AC_SEATER', 40, 
-         '["AC", "Charging Point", "Water Bottle", "Reading Light", "Live GPS Tracking"]'::jsonb, 'ACTIVE'),
-        ($2, 'TS-09-SS-1122', 'BharatBenz AC Sleeper 2+1', 'AC_SLEEPER', 30, 
-         '["AC", "Charging Point", "Blanket", "Pillow", "Water Bottle"]'::jsonb, 'ACTIVE'),
-        ($3, 'MH-02-RC-8899', 'Mercedes-Benz Super Cruiser 2+2', 'AC_SEATER', 40, 
-         '["AC", "WiFi", "Pushback Seats", "Charging Point", "Movie Screen"]'::jsonb, 'ACTIVE')
+        ($1, 'KA-01-NB-2026', 'Volvo 9600 B11R Multi-Axle Luxury Sleeper (2+1)', 'AC_SLEEPER', 30, 
+         '["AC", "High-Speed WiFi", "Charging Point", "Plush Blanket", "Mineral Water", "Reading Lamp", "GPS Live Tracking", "Emergency Hammer"]'::jsonb, 'ACTIVE'),
+        ($1, 'KA-01-NB-5050', 'Scania Metrolink Multi-Axle HD Coach (2+2)', 'AC_SEATER', 40, 
+         '["AC", "Individual USB Charger", "Water Bottle", "Reading Light", "Live GPS Tracking", "Pushback Ergonomic Seats"]'::jsonb, 'ACTIVE'),
+        ($2, 'TS-09-SS-1122', 'BharatBenz Glider AC Sleeper (2+1)', 'AC_SLEEPER', 30, 
+         '["AC", "Charging Point", "Blanket", "Pillow", "Water Bottle", "CCTV Surveillance"]'::jsonb, 'ACTIVE'),
+        ($3, 'MH-02-RC-8899', 'Mercedes-Benz Super Cruiser Executive (2+2)', 'AC_SEATER', 40, 
+         '["AC", "WiFi", "Pushback Seats", "Charging Point", "Entertainment Screen"]'::jsonb, 'ACTIVE')
       RETURNING id, bus_number, bus_type, total_seats;
-    `, [opAlgionsId, opStarId, opRoyalId]);
+    `, [opNexBusId, opStarId, opRoyalId]);
 
-    const busVolvoSleeper = busRes.rows.find(b => b.bus_number === 'KA-01-AG-2026').id;
-    const busScaniaSeater = busRes.rows.find(b => b.bus_number === 'KA-01-AG-5050').id;
+    const busVolvoSleeper = busRes.rows.find(b => b.bus_number === 'KA-01-NB-2026').id;
+    const busScaniaSeater = busRes.rows.find(b => b.bus_number === 'KA-01-NB-5050').id;
     const busBharatSleeper = busRes.rows.find(b => b.bus_number === 'TS-09-SS-1122').id;
     const busMercedesSeater = busRes.rows.find(b => b.bus_number === 'MH-02-RC-8899').id;
 
@@ -228,7 +228,7 @@ async function seedDatabase() {
     const boardingStop = (await client.query(`SELECT id FROM route_stops WHERE route_id = $1 AND stop_type = 'BOARDING' LIMIT 1`, [rBlrHyd])).rows[0]?.id || null;
     const droppingStop = (await client.query(`SELECT id FROM route_stops WHERE route_id = $1 AND stop_type = 'DROPPING' LIMIT 1`, [rBlrHyd])).rows[0]?.id || null;
 
-    const samplePnr = 'PNR-ALG-984210';
+    const samplePnr = 'PNR-NBX-984210';
     const bookingRes = await client.query(`
       INSERT INTO bookings (
         pnr, user_id, trip_id, total_fare, status, 
@@ -266,7 +266,7 @@ async function seedDatabase() {
     await client.query(`
       INSERT INTO audit_logs (user_id, action, entity_type, entity_id, new_values, ip_address)
       VALUES
-        ($1, 'BOOKING_CREATED', 'BOOKING', $2, '{"pnr": "PNR-ALG-984210", "seats": ["L3", "L4"], "total": 2750}'::jsonb, '127.0.0.1'),
+        ($1, 'BOOKING_CREATED', 'BOOKING', $2, '{"pnr": "PNR-NBX-984210", "seats": ["L3", "L4"], "total": 2750}'::jsonb, '127.0.0.1'),
         (1, 'SYSTEM_INIT', 'SYSTEM', '1', '{"message": "Database seeded with operators, routes, schedules, and policies"}'::jsonb, '127.0.0.1')
     `, [customerUser, bookingId.toString()]);
 

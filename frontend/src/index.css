@@ -3,8 +3,65 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
   body {
-    @apply antialiased selection:bg-blue-600 selection:text-white;
+    @apply antialiased bg-[#f8fafc] text-slate-900 font-sans;
+  }
+}
+
+/* Custom transit components */
+@layer components {
+  /* Perforated coupon edge for authentic boarding passes */
+  .ticket-notch-left {
+    position: relative;
+  }
+  .ticket-notch-left::before {
+    content: '';
+    position: absolute;
+    left: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background-color: #f8fafc;
+    border-radius: 50%;
+    border-right: 1px solid #e2e8f0;
+    box-shadow: inset -2px 0 3px rgba(0, 0, 0, 0.04);
+  }
+
+  .ticket-notch-right {
+    position: relative;
+  }
+  .ticket-notch-right::after {
+    content: '';
+    position: absolute;
+    right: -12px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 24px;
+    height: 24px;
+    background-color: #f8fafc;
+    border-radius: 50%;
+    border-left: 1px solid #e2e8f0;
+    box-shadow: inset 2px 0 3px rgba(0, 0, 0, 0.04);
+  }
+
+  /* Sleeper Berth pillow headrest */
+  .sleeper-berth-pillow {
+    position: relative;
+  }
+  .sleeper-berth-pillow::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 6px;
+    bottom: 6px;
+    width: 10px;
+    border-radius: 4px;
+    background-color: currentColor;
+    opacity: 0.15;
   }
 }
 
@@ -20,9 +77,8 @@
   .print-only {
     display: block !important;
   }
-  .card, .ticket-container {
+  .ticket-container {
     box-shadow: none !important;
-    border: 1px solid #ccc !important;
+    border: 1px solid #cbd5e1 !important;
   }
 }
-

@@ -2,7 +2,7 @@ const request = require('supertest');
 const app = require('../../src/app');
 const { pool } = require('../../src/config/db');
 
-describe('Algions Bus Booking System - Acceptance Test Suite', () => {
+describe('NexBus Enterprise Transit System - Acceptance Test Suite', () => {
   let customerToken;
   let customer2Token;
   let adminToken;
@@ -92,7 +92,7 @@ describe('Algions Bus Booking System - Acceptance Test Suite', () => {
 
     expect(bookRes.status).toBe(201);
     expect(bookRes.body.success).toBe(true);
-    expect(bookRes.body.data.pnr).toMatch(/^PNR-ALG-/);
+    expect(bookRes.body.data.pnr).toMatch(/^PNR-NBX-/);
     expect(bookRes.body.data.status).toBe('CONFIRMED');
 
     createdBookingId = bookRes.body.data.id;

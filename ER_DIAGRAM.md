@@ -1,4 +1,4 @@
-# Algions Bus Booking Management System - Entity Relationship Diagram
+# NexBus Enterprise Transit System - Entity Relationship Diagram
 
 ```mermaid
 erDiagram

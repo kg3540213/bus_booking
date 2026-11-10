@@ -1,7 +1,7 @@
 const API_BASE = '/api';
 
 export async function apiRequest(endpoint, options = {}) {
-  const token = localStorage.getItem('algions_token');
+  const token = localStorage.getItem('nexbus_token');
 
   const headers = {
     'Content-Type': 'application/json',

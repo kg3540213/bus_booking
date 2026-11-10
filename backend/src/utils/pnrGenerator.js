@@ -2,9 +2,9 @@ const crypto = require('crypto');
 
 /**
  * Generates a human-friendly unique PNR string
- * Example: PNR-ALG-8F3K9A
+ * Example: PNR-NBX-8F3K9A
  */
-function generatePNR(prefix = 'ALG') {
+function generatePNR(prefix = 'NBX') {
   const chars = '23456789ABCDEFGHJKLMNPQRSTUVWXYZ'; // exclude ambiguous 0,1,I,O
   let randomPart = '';
   const bytes = crypto.randomBytes(6);
@@ -15,4 +15,3 @@ function generatePNR(prefix = 'ALG') {
 }
 
 module.exports = { generatePNR };
-

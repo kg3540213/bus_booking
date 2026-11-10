@@ -1,7 +1,7 @@
 {
-  "name": "algions-bus-booking-system",
+  "name": "nexbus-transit-system",
   "version": "1.0.0",
-  "description": "Algions AI Labs - Enterprise Bus Booking Management System",
+  "description": "NexBus - Enterprise Intercity Bus Booking & Fleet Transit Management System",
   "scripts": {
     "start:backend": "npm --prefix backend start",
     "start:frontend": "npm --prefix frontend dev",
@@ -14,13 +14,13 @@
   },
   "keywords": [
     "bus-booking",
-    "algions",
+    "nexbus",
+    "transit",
     "react",
     "express",
     "postgresql",
     "docker"
   ],
-  "author": "Algions AI Labs Assessment Candidate",
+  "author": "NexBus Platform Engineering",
   "license": "UNLICENSED"
 }
-

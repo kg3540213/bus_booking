@@ -5,10 +5,10 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem('algions_user');
+    const saved = localStorage.getItem('nexbus_user');
     return saved ? JSON.parse(saved) : null;
   });
-  const [token, setToken] = useState(() => localStorage.getItem('algions_token'));
+  const [token, setToken] = useState(() => localStorage.getItem('nexbus_token'));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -17,7 +17,7 @@ export function AuthProvider({ children }) {
         .then((res) => {
           if (res.success) {
             setUser(res.data);
-            localStorage.setItem('algions_user', JSON.stringify(res.data));
+            localStorage.setItem('nexbus_user', JSON.stringify(res.data));
           }
         })
         .catch(() => {
@@ -32,8 +32,8 @@ export function AuthProvider({ children }) {
   const saveAuth = (userData, tokenStr) => {
     setUser(userData);
     setToken(tokenStr);
-    localStorage.setItem('algions_user', JSON.stringify(userData));
-    localStorage.setItem('algions_token', tokenStr);
+    localStorage.setItem('nexbus_user', JSON.stringify(userData));
+    localStorage.setItem('nexbus_token', tokenStr);
   };
 
   const login = async (email, password) => {
@@ -63,8 +63,8 @@ export function AuthProvider({ children }) {
   const logout = () => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem('algions_user');
-    localStorage.removeItem('algions_token');
+    localStorage.removeItem('nexbus_user');
+    localStorage.removeItem('nexbus_token');
   };
 
   const value = {

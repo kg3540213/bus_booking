@@ -1,12 +1,12 @@
 const swaggerDoc = {
   openapi: '3.0.3',
   info: {
-    title: 'Bus Booking Management System API',
+    title: 'NexBus Enterprise Transit API',
     version: '1.0.0',
-    description: 'Algions AI Labs - Full-Stack Bus Booking System API documentation with RBAC, seat concurrency locking, cancellation refunds, and operator manifests.',
+    description: 'NexBus Transit Management System API documentation with RBAC, seat concurrency locking, dynamic cancellation refunds, and reconciled operator manifests.',
     contact: {
-      name: 'Engineering Team',
-      email: 'engineering@algions.com'
+      name: 'NexBus Platform Engineering',
+      email: 'engineering@nexbus.com'
     }
   },
   servers: [
@@ -96,7 +96,7 @@ const swaggerDoc = {
               schema: {
                 type: 'object',
                 properties: {
-                  email: { type: 'string', example: 'admin@algions.com' },
+                  email: { type: 'string', example: 'admin@nexbus.com' },
                   password: { type: 'string', example: 'Admin@123' }
                 }
               }

@@ -106,10 +106,10 @@ async function createBooking(req, res, next) {
     const totalFare = seatsRes.rows.reduce((sum, s) => sum + Number(s.fare), 0);
 
     // 4. Generate unique PNR
-    let pnr = generatePNR('ALG');
+    let pnr = generatePNR('NBX');
     let pnrCheck = await client.query('SELECT id FROM bookings WHERE pnr = $1', [pnr]);
     while (pnrCheck.rows.length > 0) {
-      pnr = generatePNR('ALG');
+      pnr = generatePNR('NBX');
       pnrCheck = await client.query('SELECT id FROM bookings WHERE pnr = $1', [pnr]);
     }
 
