@@ -1,7 +1,13 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { Bus, Lock, Mail, User, Shield, CheckCircle2, AlertCircle, ArrowRight, Sparkles } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { ArrowRight, BusFront, LockKeyhole, Mail, ShieldCheck, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+
+const personas = [
+  { role: 'CUSTOMER', label: 'Passenger', email: 'user@example.com', password: 'User@123' },
+  { role: 'OPERATOR', label: 'Operator', email: 'operator@intercity.com', password: 'Operator@123' },
+  { role: 'ADMIN', label: 'Admin', email: 'admin@nexbus.com', password: 'Admin@123' },
+];
 
 export default function Login() {
   const [selectedRole, setSelectedRole] = useState('CUSTOMER');
@@ -9,229 +15,121 @@ export default function Login() {
   const [password, setPassword] = useState('User@123');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
   const { login, demoLogin } = useAuth();
   const navigate = useNavigate();
 
-  // Role metadata and quick credentials
-  const roleConfig = {
-    CUSTOMER: {
-      title: 'Passenger Account Sign In',
-      badge: 'Passenger',
-      badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200',
-      description: 'Book intercity buses, select berths, manage reservations, track live trips, and process instant refunds.',
-      demoEmail: 'user@example.com',
-      demoPass: 'User@123',
-      redirect: '/',
-      icon: User,
-    },
-    OPERATOR: {
-      title: 'Fleet Dispatcher & Conductor Portal',
-      badge: 'Fleet Operator',
-      badgeColor: 'bg-blue-50 text-blue-800 border-blue-200',
-      description: 'Access route schedules, passenger manifests, conductor check-in, and seat occupancy reports.',
-      demoEmail: 'operator@intercity.com',
-      demoPass: 'Operator@123',
-      redirect: '/operator',
-      icon: Bus,
-    },
-    ADMIN: {
-      title: 'System Administrator Console',
-      badge: 'System Admin',
-      badgeColor: 'bg-purple-50 text-purple-800 border-purple-200',
-      description: 'Manage bus operators, fleet inventory, routes, trips, live security audit trail, and analytics.',
-      demoEmail: 'admin@nexbus.com',
-      demoPass: 'Admin@123',
-      redirect: '/admin',
-      icon: Shield,
-    },
-  };
+  const destinationFor = (role) => role === 'ADMIN' ? '/admin' : role === 'OPERATOR' ? '/operator' : '/';
 
-  const currentConfig = roleConfig[selectedRole];
-
-  const handleRoleSelect = (role) => {
-    setSelectedRole(role);
-    setError('');
-    setEmail(roleConfig[role].demoEmail);
-    setPassword(roleConfig[role].demoPass);
-  };
-
-  const handleStandardLogin = async (e) => {
-    e.preventDefault();
+  const handleLogin = async (event) => {
+    event.preventDefault();
     setLoading(true);
     setError('');
-
     try {
-      const res = await login(email, password);
-      if (res.success) {
-        const userRole = res.data.user.role;
-        if (userRole === 'ADMIN') navigate('/admin');
-        else if (userRole === 'OPERATOR') navigate('/operator');
-        else navigate('/');
-      }
+      const result = await login(email, password);
+      if (result.success) navigate(destinationFor(result.data.user.role));
     } catch (err) {
-      setError(err.message || 'Invalid email or password');
+      setError(err.message || 'We could not sign you in. Check your details and try again.');
     } finally {
       setLoading(false);
     }
   };
 
-  const handleOneClickDemo = async () => {
+  const handleDemoLogin = async () => {
     setLoading(true);
     setError('');
     try {
-      const res = await demoLogin(selectedRole);
-      if (res.success) {
-        navigate(currentConfig.redirect);
-      }
+      const result = await demoLogin(selectedRole);
+      if (result.success) navigate(destinationFor(selectedRole));
     } catch (err) {
-      setError(err.message || 'Demo login failed');
+      setError(err.message || 'Demo sign-in is unavailable right now.');
     } finally {
       setLoading(false);
     }
+  };
+
+  const selectPersona = (persona) => {
+    setSelectedRole(persona.role);
+    setEmail(persona.email);
+    setPassword(persona.password);
+    setError('');
   };
 
   return (
-    <div className="max-w-lg mx-auto my-12 px-4 space-y-6">
-      {/* Brand Header */}
-      <div className="text-center space-y-2">
-        <div className="w-12 h-12 rounded-2xl bg-brand-600 text-white flex items-center justify-center mx-auto shadow-md shadow-brand-600/20">
-          <Bus className="w-6 h-6" />
+    <div className="mx-auto grid min-h-[calc(100vh-120px)] max-w-7xl items-center gap-8 px-5 py-10 sm:px-8 lg:grid-cols-[1fr_0.85fr] lg:gap-16 lg:px-10">
+      <section className="relative hidden min-h-[550px] overflow-hidden rounded-[2rem] bg-slate-950 lg:block">
+        <img
+          src="https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1400&q=85"
+          alt="A coach travelling along an open road"
+          className="absolute inset-0 h-full w-full object-cover opacity-65"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/25 to-slate-950/10" />
+        <div className="absolute inset-x-0 bottom-0 p-10 text-white">
+          <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-xs backdrop-blur"><BusFront className="h-4 w-4" /> NexBus travel</span>
+          <h1 className="mt-5 max-w-lg text-4xl font-semibold leading-tight tracking-tight">The road ahead is looking good.</h1>
+          <p className="mt-3 max-w-md text-sm leading-6 text-white/75">Sign in to pick up where you left off, manage your tickets, and make your next trip yours.</p>
         </div>
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Sign In to NexBus</h1>
-        <p className="text-xs text-slate-500">
-          Select your account role to continue with tailored operational access
-        </p>
-      </div>
+      </section>
 
-      {/* Role Selection Segmented Control */}
-      <div className="bg-white p-1.5 rounded-2xl border border-slate-200 shadow-2xs grid grid-cols-3 gap-1">
-        {[
-          { id: 'CUSTOMER', label: 'Passenger', icon: User },
-          { id: 'OPERATOR', label: 'Bus Operator', icon: Bus },
-          { id: 'ADMIN', label: 'System Admin', icon: Shield },
-        ].map(tab => {
-          const Icon = tab.icon;
-          const isActive = selectedRole === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => handleRoleSelect(tab.id)}
-              className={`py-2.5 px-2 rounded-xl text-xs font-bold flex flex-col items-center justify-center gap-1.5 transition ${
-                isActive
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-              }`}
-            >
-              <Icon className="w-4 h-4" />
-              <span>{tab.label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Role Context & 1-Click Login Card */}
-      <div className="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-        <div className="flex items-center justify-between">
-          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${currentConfig.badgeColor}`}>
-            {currentConfig.badge} Persona
+      <section className="mx-auto w-full max-w-md">
+        <div className="mb-7 text-center lg:text-left">
+          <span className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-rose-50 text-brand-700 lg:mx-0">
+            <UserRound className="h-6 w-6" />
           </span>
-          <span className="text-[11px] text-slate-500 font-medium">Reviewer Preset</span>
-        </div>
-        <p className="text-xs text-slate-600 leading-relaxed">
-          {currentConfig.description}
-        </p>
-
-        <button
-          type="button"
-          onClick={handleOneClickDemo}
-          disabled={loading}
-          className="w-full py-2.5 bg-white hover:bg-slate-100/80 text-slate-800 border border-slate-300 font-bold text-xs rounded-xl shadow-2xs transition flex items-center justify-center gap-2"
-        >
-          <Sparkles className="w-3.5 h-3.5 text-brand-600" />
-          <span>1-Click Sign In as {currentConfig.badge} ({currentConfig.demoEmail})</span>
-        </button>
-      </div>
-
-      {error && (
-        <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2.5 text-red-900 text-xs">
-          <AlertCircle className="w-4 h-4 text-red-600 shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-
-      {/* Email / Password Form */}
-      <div className="bg-white p-6 sm:p-7 rounded-2xl border border-slate-200 shadow-xs space-y-5">
-        <div className="border-b border-slate-100 pb-3">
-          <h2 className="text-sm font-extrabold text-slate-900">{currentConfig.title}</h2>
-          <p className="text-xs text-slate-400">Enter your credentials or click the preset above</p>
+          <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-700">Welcome back</p>
+          <h2 className="mt-1 text-3xl font-semibold tracking-tight text-slate-950">Log in to NexBus</h2>
+          <p className="mt-2 text-sm text-slate-500">Enter your details to continue.</p>
         </div>
 
-        <form onSubmit={handleStandardLogin} className="space-y-4 text-xs">
-          <div>
-            <label className="block font-bold text-slate-600 uppercase tracking-wider mb-1">
-              Email Address
-            </label>
-            <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-              <input
-                type="email"
-                required
-                placeholder="name@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition"
-              />
-            </div>
+        <div className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-7">
+          <div className="mb-5 grid grid-cols-3 gap-1 rounded-xl bg-slate-100 p-1">
+            {personas.map((persona) => (
+              <button
+                key={persona.role}
+                type="button"
+                onClick={() => selectPersona(persona)}
+                className={`rounded-lg px-2 py-2.5 text-xs font-medium transition ${
+                  selectedRole === persona.role ? 'bg-white text-slate-950 shadow-sm' : 'text-slate-500 hover:text-slate-800'
+                }`}
+              >
+                {persona.label}
+              </button>
+            ))}
           </div>
 
-          <div>
-            <label className="block font-bold text-slate-600 uppercase tracking-wider mb-1">
-              Password
-            </label>
-            <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5" />
-              <input
-                type="password"
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl py-3 pl-10 pr-4 text-xs font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition font-mono"
-              />
-            </div>
-          </div>
+          {error && <div role="alert" className="mb-4 rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-3 text-xs text-rose-800">{error}</div>}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full py-3.5 bg-brand-600 hover:bg-brand-700 disabled:opacity-50 text-white rounded-xl font-bold text-xs shadow-md shadow-brand-600/20 transition flex items-center justify-center gap-2"
-          >
-            {loading ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                <span>Signing In...</span>
-              </>
-            ) : (
-              <>
-                <span>Sign In as {selectedRole.toLowerCase()}</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
+          <form onSubmit={handleLogin} className="space-y-4">
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-medium text-slate-700">Email address</span>
+              <span className="relative block">
+                <Mail className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+                <input type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-100" placeholder="you@example.com" />
+              </span>
+            </label>
+            <label className="block">
+              <span className="mb-1.5 block text-xs font-medium text-slate-700">Password</span>
+              <span className="relative block">
+                <LockKeyhole className="absolute left-3.5 top-3.5 h-4 w-4 text-slate-400" />
+                <input type="password" required autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="w-full rounded-xl border border-slate-200 bg-white py-3 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-brand-400 focus:ring-4 focus:ring-brand-100" placeholder="Your password" />
+              </span>
+            </label>
+
+            <button type="submit" disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl bg-brand-600 px-4 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 disabled:cursor-wait disabled:opacity-60">
+              {loading ? 'Signing in…' : 'Log in'} {!loading && <ArrowRight className="h-4 w-4" />}
+            </button>
+          </form>
+
+          <div className="my-5 flex items-center gap-3 text-[11px] text-slate-400">
+            <span className="h-px flex-1 bg-slate-100" /> or use a demo account <span className="h-px flex-1 bg-slate-100" />
+          </div>
+          <button type="button" onClick={handleDemoLogin} disabled={loading} className="flex w-full items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs font-semibold text-slate-700 transition hover:border-slate-300 hover:bg-slate-50 disabled:opacity-60">
+            <ShieldCheck className="h-4 w-4 text-emerald-600" /> Continue as {personas.find((persona) => persona.role === selectedRole)?.label}
           </button>
-        </form>
-
-        <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
-          <span>New to NexBus?</span>
-          <Link
-            to="/register"
-            className="font-bold text-brand-600 hover:text-brand-700 hover:underline"
-          >
-            Create an Account →
-          </Link>
+          <p className="mt-5 text-center text-xs text-slate-500">
+            New to NexBus? <Link to="/register" className="font-semibold text-brand-700 hover:text-brand-800">Create an account</Link>
+          </p>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

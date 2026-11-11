@@ -23,4 +23,3 @@ module.exports = {
   getClient: () => pool.connect(),
   pool,
 };
-

@@ -5,9 +5,28 @@
 @layer base {
   html {
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    scroll-behavior: smooth;
   }
   body {
-    @apply antialiased bg-[#f8fafc] text-slate-900 font-sans;
+    @apply antialiased bg-[#f7f8fa] text-slate-900 font-sans;
+    text-rendering: optimizeLegibility;
+  }
+  button,
+  input,
+  select,
+  textarea {
+    font: inherit;
+  }
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+  :focus-visible {
+    outline: 2px solid #d84e55;
+    outline-offset: 3px;
+  }
+  ::selection {
+    color: #fff;
+    background: #c2383f;
   }
 }
 
@@ -80,5 +99,16 @@
   .ticket-container {
     box-shadow: none !important;
     border: 1px solid #cbd5e1 !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
   }
 }

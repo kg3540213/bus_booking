@@ -328,7 +328,7 @@ export default function BookingCheckout() {
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
             <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
               <Mail className="w-4 h-4 text-brand-600" />
-              <span>3. Contact Information for E-Ticket & Live SMS</span>
+              <span>3. Contact details for your ticket</span>
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
@@ -370,15 +370,15 @@ export default function BookingCheckout() {
             </div>
           </div>
 
-          {/* Section 4: Payment Simulation */}
+          {/* Payment options are visual-only in this demo. */}
           <div className="bg-white p-6 rounded-2xl border border-slate-200 shadow-xs space-y-4">
             <div className="flex items-center justify-between">
               <h2 className="text-sm font-extrabold text-slate-900 uppercase tracking-wider flex items-center gap-2">
                 <CreditCard className="w-4 h-4 text-brand-600" />
-                <span>4. Payment Method</span>
+                <span>4. Payment preference</span>
               </h2>
-              <span className="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5" /> 100% Secure Sandbox
+              <span className="text-[11px] font-medium text-slate-500 flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" /> Demo only · no payment is collected
               </span>
             </div>
 

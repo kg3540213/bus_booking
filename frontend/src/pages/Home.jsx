@@ -1,439 +1,242 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Bus, MapPin, Calendar, ArrowRightLeft, Search, ShieldCheck,
-  CheckCircle2, Award, Zap, Tag, Clock, ChevronRight, Star,
-  Shield, Users, RefreshCw, Copy, Check
+  ArrowDownUp, ArrowRight, BusFront, CalendarDays, Clock3, MapPin,
+  Search, ShieldCheck, Sparkles, Star
 } from 'lucide-react';
 import { routesApi } from '../services/api';
+
+const featuredRoutes = [
+  {
+    from: 'Bangalore',
+    to: 'Hyderabad',
+    duration: '9 hr',
+    image: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=900&q=85',
+  },
+  {
+    from: 'Mumbai',
+    to: 'Pune',
+    duration: '3 hr',
+    image: 'https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=900&q=85',
+  },
+  {
+    from: 'Bangalore',
+    to: 'Chennai',
+    duration: '6 hr',
+    image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=85',
+  },
+];
+
+const localDateString = (date = new Date()) => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+};
 
 export default function Home() {
   const navigate = useNavigate();
   const [cities, setCities] = useState(['Bangalore', 'Hyderabad', 'Mumbai', 'Pune', 'Chennai']);
   const [source, setSource] = useState('Bangalore');
   const [destination, setDestination] = useState('Hyderabad');
-
-  // Dates
-  const today = new Date();
-  const todayStr = today.toISOString().split('T')[0];
-
-  const tomorrow = new Date(today);
-  tomorrow.setDate(tomorrow.getDate() + 1);
-  const tomorrowStr = tomorrow.toISOString().split('T')[0];
-
-  const [travelDate, setTravelDate] = useState(todayStr);
-  const [copiedCode, setCopiedCode] = useState(null);
+  const [travelDate, setTravelDate] = useState(() => localDateString());
 
   useEffect(() => {
-    routesApi.getCities()
-      .then(res => {
-        if (res.success && res.data.length > 0) {
-          setCities(res.data);
-        }
-      })
-      .catch(() => {});
+    routesApi.getCities().then((res) => {
+      if (!res.success || res.data.length === 0) return;
+      const availableCities = [...new Set(res.data)];
+      setCities(availableCities);
+      setSource((current) => availableCities.includes(current) ? current : availableCities[0]);
+      setDestination((current) => availableCities.includes(current) ? current : availableCities[1] || availableCities[0]);
+    }).catch(() => {});
   }, []);
 
-  const handleSwap = () => {
-    const temp = source;
-    setSource(destination);
-    setDestination(temp);
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (!source || !destination) return;
-    navigate(`/search?source=${encodeURIComponent(source)}&destination=${encodeURIComponent(destination)}&date=${travelDate}`);
-  };
-
-  const handleQuickRoute = (src, dest) => {
-    setSource(src);
-    setDestination(dest);
-    navigate(`/search?source=${encodeURIComponent(src)}&destination=${encodeURIComponent(dest)}&date=${travelDate}`);
-  };
-
-  const handleCopyCode = (code) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(code);
-    setTimeout(() => setCopiedCode(null), 2000);
+  const searchTrips = (from, to) => {
+    if (!from || !to || from === to) return;
+    const params = new URLSearchParams({ source: from, destination: to, date: travelDate });
+    navigate(`/search?${params.toString()}`);
   };
 
   return (
-    <div className="space-y-16 pb-20">
-      {/* Hero Section */}
-      <section className="relative bg-slate-900 text-white pt-12 pb-24 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-        <div className="max-w-6xl mx-auto space-y-8">
-          {/* Header tagline */}
-          <div className="text-center space-y-3 max-w-3xl mx-auto">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-xs font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand-500"></span>
-              <span>Next-Generation Intercity Transit Network</span>
+    <div className="pb-20">
+      <section className="relative isolate overflow-hidden bg-slate-950">
+        <div
+          className="absolute inset-0 -z-20 bg-cover bg-center"
+          style={{ backgroundImage: "url('https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=2200&q=90')" }}
+        />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-r from-slate-950/95 via-slate-950/80 to-slate-950/35" />
+        <div className="absolute inset-0 -z-10 bg-gradient-to-t from-slate-950/70 via-transparent to-slate-950/10" />
+
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 pb-24 pt-16 sm:px-8 sm:pb-28 sm:pt-24 lg:grid-cols-[1fr_0.95fr] lg:gap-16 lg:px-10">
+          <div className="max-w-2xl text-white">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/10 px-3.5 py-2 text-xs font-medium text-white/85 backdrop-blur">
+              <Sparkles className="h-3.5 w-3.5 text-amber-300" />
+              A better way to get there
             </div>
-
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
-              India's Most Reliable <br className="hidden sm:inline" />
-              <span className="text-brand-500">Bus Booking & Transit Engine</span>
+            <h1 className="max-w-xl text-4xl font-semibold leading-[1.08] tracking-tight sm:text-5xl lg:text-6xl">
+              The journey is part of the <span className="text-rose-300">plan.</span>
             </h1>
-
-            <p className="text-sm sm:text-base text-slate-400 font-normal max-w-2xl mx-auto">
-              Direct operator inventory, guaranteed ACID seat locking, instant cancellation refunds, and digital passenger manifests.
+            <p className="mt-5 max-w-lg text-sm leading-7 text-slate-200 sm:text-base">
+              Find a seat that feels right, book in a few steps, and get on with your trip.
             </p>
+            <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3 text-xs text-white/80">
+              <span className="inline-flex items-center gap-2"><ShieldCheck className="h-4 w-4 text-emerald-300" /> Secure seat booking</span>
+              <span className="inline-flex items-center gap-2"><BusFront className="h-4 w-4 text-rose-200" /> Routes that fit your day</span>
+            </div>
           </div>
 
-          {/* Search Box Console */}
-          <div className="bg-white text-slate-900 rounded-2xl p-4 sm:p-6 shadow-xl border border-slate-200/80">
-            <form onSubmit={handleSearch} className="space-y-4">
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 items-center">
-                {/* Source City */}
-                <div className="lg:col-span-4 bg-slate-50 hover:bg-slate-100/80 p-3.5 rounded-xl border border-slate-200 transition">
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                    <Bus className="w-3.5 h-3.5 text-brand-600" /> From / Boarding Point
-                  </label>
+          <div className="rounded-3xl bg-white p-5 shadow-2xl shadow-black/25 sm:p-7">
+            <div className="mb-6">
+              <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-700">Plan your trip</p>
+              <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Where are you headed?</h2>
+            </div>
+            <form
+              onSubmit={(event) => {
+                event.preventDefault();
+                searchTrips(source, destination);
+              }}
+              className="space-y-3"
+            >
+              <div className="grid gap-3 sm:grid-cols-[1fr_auto_1fr] sm:items-center">
+                <label className="block rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition focus-within:border-brand-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-100">
+                  <span className="mb-1.5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    <MapPin className="h-3.5 w-3.5 text-brand-600" /> Leaving from
+                  </span>
                   <select
                     value={source}
-                    onChange={(e) => setSource(e.target.value)}
-                    className="w-full bg-transparent text-sm font-bold text-slate-900 focus:outline-none cursor-pointer"
+                    onChange={(event) => setSource(event.target.value)}
+                    className="w-full cursor-pointer bg-transparent text-sm font-semibold text-slate-900 outline-none"
                     required
                   >
-                    {cities.map((city) => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
+                    {cities.map((city) => <option key={city} value={city}>{city}</option>)}
                   </select>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {['Bangalore', 'Mumbai', 'Pune'].map(c => (
-                      <button
-                        key={c}
-                        type="button"
-                        onClick={() => setSource(c)}
-                        className={`text-[10px] px-2 py-0.5 rounded font-medium transition ${
-                          source === c
-                            ? 'bg-brand-600 text-white'
-                            : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
-                        }`}
-                      >
-                        {c}
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                </label>
 
-                {/* Swap Button */}
-                <div className="lg:col-span-1 flex justify-center -my-2 lg:my-0">
-                  <button
-                    type="button"
-                    onClick={handleSwap}
-                    title="Swap From and To"
-                    className="w-10 h-10 rounded-full bg-white hover:bg-slate-100 text-slate-700 flex items-center justify-center transition shadow-sm border border-slate-200 hover:rotate-180 transform duration-300"
-                  >
-                    <ArrowRightLeft className="w-4 h-4 text-brand-600" />
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  aria-label="Swap departure and destination"
+                  onClick={() => {
+                    setSource(destination);
+                    setDestination(source);
+                  }}
+                  className="mx-auto flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-500 shadow-sm transition hover:border-brand-200 hover:text-brand-700 sm:mx-0"
+                >
+                  <ArrowDownUp className="h-4 w-4" />
+                </button>
 
-                {/* Destination City */}
-                <div className="lg:col-span-4 bg-slate-50 hover:bg-slate-100/80 p-3.5 rounded-xl border border-slate-200 transition">
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5 text-slate-700" /> To / Dropping Point
-                  </label>
+                <label className="block rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition focus-within:border-brand-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-100">
+                  <span className="mb-1.5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                    <MapPin className="h-3.5 w-3.5 text-slate-500" /> Going to
+                  </span>
                   <select
                     value={destination}
-                    onChange={(e) => setDestination(e.target.value)}
-                    className="w-full bg-transparent text-sm font-bold text-slate-900 focus:outline-none cursor-pointer"
+                    onChange={(event) => setDestination(event.target.value)}
+                    className="w-full cursor-pointer bg-transparent text-sm font-semibold text-slate-900 outline-none"
                     required
                   >
-                    {cities.map((city) => (
-                      <option key={city} value={city}>{city}</option>
-                    ))}
+                    {cities.map((city) => <option key={city} value={city}>{city}</option>)}
                   </select>
-                  <div className="flex flex-wrap gap-1 mt-2">
-                    {['Hyderabad', 'Chennai', 'Pune'].map(c => (
-                      <button
-                        key={c}
-                        type="button"
-                        onClick={() => setDestination(c)}
-                        className={`text-[10px] px-2 py-0.5 rounded font-medium transition ${
-                          destination === c
-                            ? 'bg-brand-600 text-white'
-                            : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
-                        }`}
-                      >
-                        {c}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Date Picker */}
-                <div className="lg:col-span-3 bg-slate-50 hover:bg-slate-100/80 p-3.5 rounded-xl border border-slate-200 transition">
-                  <label className="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-1 flex items-center gap-1.5">
-                    <Calendar className="w-3.5 h-3.5 text-brand-600" /> Travel Date
-                  </label>
-                  <input
-                    type="date"
-                    value={travelDate}
-                    min={todayStr}
-                    onChange={(e) => setTravelDate(e.target.value)}
-                    className="w-full bg-transparent text-sm font-bold text-slate-900 focus:outline-none font-mono cursor-pointer"
-                    required
-                  />
-                  <div className="flex gap-1.5 mt-2">
-                    <button
-                      type="button"
-                      onClick={() => setTravelDate(todayStr)}
-                      className={`text-[10px] px-2.5 py-0.5 rounded font-semibold transition ${
-                        travelDate === todayStr
-                          ? 'bg-slate-900 text-white'
-                          : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
-                      }`}
-                    >
-                      Today
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTravelDate(tomorrowStr)}
-                      className={`text-[10px] px-2.5 py-0.5 rounded font-semibold transition ${
-                        travelDate === tomorrowStr
-                          ? 'bg-slate-900 text-white'
-                          : 'bg-white border border-slate-200 text-slate-600 hover:border-slate-300'
-                      }`}
-                    >
-                      Tomorrow
-                    </button>
-                  </div>
-                </div>
+                </label>
               </div>
 
-              {/* Submit CTA */}
+              <label className="block rounded-2xl border border-slate-200 bg-slate-50 px-4 py-3 transition focus-within:border-brand-400 focus-within:bg-white focus-within:ring-4 focus-within:ring-brand-100">
+                <span className="mb-1.5 flex items-center gap-2 text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                  <CalendarDays className="h-3.5 w-3.5 text-brand-600" /> Travel date
+                </span>
+                <input
+                  type="date"
+                  min={localDateString()}
+                  value={travelDate}
+                  onChange={(event) => setTravelDate(event.target.value)}
+                  className="w-full cursor-pointer bg-transparent text-sm font-semibold text-slate-900 outline-none"
+                  required
+                />
+              </label>
+
               <button
                 type="submit"
-                className="w-full py-3.5 bg-brand-600 hover:bg-brand-700 text-white font-bold text-sm rounded-xl shadow-md shadow-brand-600/20 flex items-center justify-center gap-2 transition active:scale-[0.99]"
+                disabled={source === destination}
+                className="flex w-full items-center justify-center gap-2 rounded-2xl bg-brand-600 px-5 py-4 text-sm font-semibold text-white shadow-lg shadow-brand-600/20 transition hover:bg-brand-700 hover:shadow-xl disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <Search className="w-4 h-4" />
-                <span>Search Available Buses</span>
+                <Search className="h-4 w-4" />
+                Search buses
+                <ArrowRight className="ml-1 h-4 w-4" />
               </button>
+              {source === destination && (
+                <p className="text-center text-xs text-rose-600">Choose two different cities to continue.</p>
+              )}
             </form>
-          </div>
-
-          {/* Trust Highlights */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center pt-2">
-            <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-800">
-              <div className="text-lg font-black text-white font-mono">10,000+</div>
-              <div className="text-[11px] text-slate-400 font-medium">Daily Intercity Routes</div>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-800">
-              <div className="text-lg font-black text-emerald-400 font-mono">100%</div>
-              <div className="text-[11px] text-slate-400 font-medium">ACID Seat Exclusivity</div>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-800">
-              <div className="text-lg font-black text-amber-400 font-mono">Instant</div>
-              <div className="text-[11px] text-slate-400 font-medium">Automated Tiered Refund</div>
-            </div>
-            <div className="p-3 rounded-xl bg-slate-800/40 border border-slate-800">
-              <div className="text-lg font-black text-white font-mono">₹0</div>
-              <div className="text-[11px] text-slate-400 font-medium">Hidden Booking Fees</div>
+            <div className="mt-5 flex items-center justify-center gap-2 text-[11px] text-slate-500">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+              Your seats are held securely while your booking is confirmed
             </div>
           </div>
         </div>
       </section>
 
-      {/* Promotional Offers Grid */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-5">
+      <section className="mx-auto max-w-7xl px-5 pt-14 sm:px-8 lg:px-10">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2">
-              <Tag className="w-5 h-5 text-brand-600" />
-              <span>Available Promo Codes & Discounts</span>
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">Apply during checkout for immediate fare reductions</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-brand-700">A little inspiration</p>
+            <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">Popular ways to go</h2>
+            <p className="mt-1 text-sm text-slate-500">Pick a route to see available trips.</p>
           </div>
+          <span className="hidden items-center gap-1.5 text-xs text-slate-500 sm:flex">
+            <Star className="h-3.5 w-3.5 fill-amber-400 text-amber-400" /> Your next stop is closer than you think
+          </span>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-          {/* Coupon 1 */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs relative overflow-hidden flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="px-2 py-0.5 bg-brand-50 text-brand-700 text-[10px] font-bold rounded uppercase tracking-wider border border-brand-200">
-                  New Traveler
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleCopyCode('NEXFIRST')}
-                  className="flex items-center gap-1 text-[11px] font-mono font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition"
-                >
-                  {copiedCode === 'NEXFIRST' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-slate-500" />}
-                  <span>NEXFIRST</span>
-                </button>
-              </div>
-              <h3 className="text-base font-extrabold text-slate-900 mt-3">Flat ₹150 Off</h3>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Save ₹150 on your first bus reservation across all AC Sleeper and Seater routes.
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-dashed border-slate-200 text-[11px] text-slate-400">
-              No minimum booking value required
-            </div>
-          </div>
-
-          {/* Coupon 2 */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs relative overflow-hidden flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="px-2 py-0.5 bg-blue-50 text-blue-700 text-[10px] font-bold rounded uppercase tracking-wider border border-blue-200">
-                  Volvo Special
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleCopyCode('SAVE10')}
-                  className="flex items-center gap-1 text-[11px] font-mono font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 px-2 py-1 rounded transition"
-                >
-                  {copiedCode === 'SAVE10' ? <Check className="w-3 h-3 text-emerald-600" /> : <Copy className="w-3 h-3 text-slate-500" />}
-                  <span>SAVE10</span>
-                </button>
-              </div>
-              <h3 className="text-base font-extrabold text-slate-900 mt-3">Flat 10% Discount</h3>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                Enjoy 10% off on all Volvo 9600 Multi-Axle luxury sleeper buses.
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-dashed border-slate-200 text-[11px] text-slate-400">
-              Applicable on single and return bookings
-            </div>
-          </div>
-
-          {/* Coupon 3 */}
-          <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs relative overflow-hidden flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between gap-2">
-                <span className="px-2 py-0.5 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded uppercase tracking-wider border border-emerald-200">
-                  Always Active
-                </span>
-                <span className="text-[11px] font-mono font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                  AUTO APPLIED
-                </span>
-              </div>
-              <h3 className="text-base font-extrabold text-slate-900 mt-3">Zero Convenience Fee</h3>
-              <p className="text-xs text-slate-600 mt-1 leading-relaxed">
-                NexBus charges exactly the bus operator fare with zero gateway markups.
-              </p>
-            </div>
-            <div className="mt-4 pt-3 border-t border-dashed border-slate-200 text-[11px] text-slate-400">
-              Guaranteed lowest price vs aggregators
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Popular Corridors */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-5">
-          <h2 className="text-xl font-extrabold text-slate-900 tracking-tight">Popular Travel Corridors</h2>
-          <p className="text-xs text-slate-500 mt-0.5">High frequency routes with verified operators</p>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {[
-            {
-              from: 'Bangalore',
-              to: 'Hyderabad',
-              time: '7h 45m',
-              fare: '₹1,299',
-              departures: '24 buses daily',
-              type: 'Volvo Multi-Axle Sleeper',
-            },
-            {
-              from: 'Mumbai',
-              to: 'Pune',
-              time: '3h 30m',
-              fare: '₹499',
-              departures: '48 buses daily',
-              type: 'AC High Deck Seater',
-            },
-            {
-              from: 'Bangalore',
-              to: 'Chennai',
-              time: '5h 45m',
-              fare: '₹850',
-              departures: '32 buses daily',
-              type: 'Luxury AC Sleeper 2+1',
-            },
-          ].map((corridor, idx) => (
-            <div
-              key={idx}
-              onClick={() => handleQuickRoute(corridor.from, corridor.to)}
-              className="bg-white p-5 rounded-2xl border border-slate-200 hover:border-brand-500 hover:shadow-md transition cursor-pointer group"
+        <div className="grid gap-5 md:grid-cols-3">
+          {featuredRoutes.map((route) => (
+            <button
+              key={`${route.from}-${route.to}`}
+              type="button"
+              onClick={() => searchTrips(route.from, route.to)}
+              className="group overflow-hidden rounded-3xl border border-slate-200 bg-white text-left shadow-sm transition duration-300 hover:-translate-y-1 hover:shadow-xl"
             >
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold text-brand-600 bg-brand-50 px-2 py-0.5 rounded">
-                  {corridor.type}
-                </span>
-                <span className="text-xs text-slate-400 font-medium">{corridor.departures}</span>
-              </div>
-
-              <div className="flex items-center gap-2 font-extrabold text-slate-900 text-base mt-3 group-hover:text-brand-600 transition">
-                <span>{corridor.from}</span>
-                <ChevronRight className="w-4 h-4 text-slate-400" />
-                <span>{corridor.to}</span>
-              </div>
-
-              <div className="flex items-center justify-between mt-4 pt-3 border-t border-slate-100 text-xs">
-                <div className="text-slate-500 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{corridor.time}</span>
-                </div>
-                <div>
-                  <span className="text-[11px] text-slate-400">Starting at </span>
-                  <strong className="text-slate-900 font-mono text-sm">{corridor.fare}</strong>
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={route.image}
+                  alt={`${route.from} to ${route.to}`}
+                  loading="lazy"
+                  className="h-full w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/10 to-transparent" />
+                <div className="absolute bottom-4 left-5 right-5 flex items-end justify-between text-white">
+                  <div>
+                    <p className="text-lg font-semibold tracking-tight">{route.from} <span className="text-rose-200">to</span> {route.to}</p>
+                    <p className="mt-1 flex items-center gap-1.5 text-xs text-white/80"><Clock3 className="h-3.5 w-3.5" /> Around {route.duration}</p>
+                  </div>
+                  <span className="mb-0.5 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 backdrop-blur transition group-hover:bg-white group-hover:text-slate-900">
+                    <ArrowRight className="h-4 w-4" />
+                  </span>
                 </div>
               </div>
-            </div>
+              <div className="flex items-center justify-between px-5 py-4 text-xs text-slate-500">
+                <span>See available departures</span>
+                <span className="font-semibold text-brand-700">Explore route</span>
+              </div>
+            </button>
           ))}
         </div>
       </section>
 
-      {/* Engineering & Platform Standards */}
-      <section className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-slate-900 text-white rounded-3xl p-8 sm:p-10 border border-slate-800">
-          <div className="max-w-3xl mb-8">
-            <span className="text-xs font-bold text-brand-400 tracking-wider uppercase">Built for Scale & Integrity</span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-white mt-1">
-              Enterprise Transit Engine Architecture
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-2">
-              Designed from the database layer up to eliminate double bookings, ensure strict conductor check-in reconciliation, and process verifiable policy-driven refunds.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="bg-slate-800/60 p-5 rounded-xl border border-slate-700/60 space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-brand-500/10 border border-brand-500/20 text-brand-400 flex items-center justify-center font-bold">
-                <ShieldCheck className="w-5 h-5" />
+      <section className="mx-auto mt-12 max-w-7xl px-5 sm:px-8 lg:px-10">
+        <div className="grid gap-4 rounded-3xl border border-slate-200 bg-white p-5 sm:grid-cols-3 sm:p-7">
+          {[
+            { title: 'Choose your seat', text: 'See the layout before you book.', icon: BusFront },
+            { title: 'Book with confidence', text: 'Seats are protected during checkout.', icon: ShieldCheck },
+            { title: 'Plans can change', text: 'Check the cancellation quote before you confirm.', icon: Clock3 },
+          ].map(({ title, text, icon: Icon }) => (
+            <div key={title} className="flex gap-3 rounded-2xl p-3 sm:p-4">
+              <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-rose-50 text-brand-700">
+                <Icon className="h-5 w-5" />
+              </span>
+              <div>
+                <h3 className="text-sm font-semibold text-slate-900">{title}</h3>
+                <p className="mt-1 text-xs leading-5 text-slate-500">{text}</p>
               </div>
-              <h3 className="font-bold text-white text-sm">Pessimistic Seat Locking</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Row-level locking (`SELECT FOR UPDATE`) prevents two travelers from ever securing the same seat during simultaneous checkout spikes.
-              </p>
             </div>
-
-            <div className="bg-slate-800/60 p-5 rounded-xl border border-slate-700/60 space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-                <RefreshCw className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-white text-sm">Automated Refund Policies</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Dynamic tiered cancellation rules (90% &gt;24h, 50% 12-24h, 25% 2-12h, 0% &lt;2h) calculate instant simulated payouts.
-              </p>
-            </div>
-
-            <div className="bg-slate-800/60 p-5 rounded-xl border border-slate-700/60 space-y-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-bold">
-                <Users className="w-5 h-5" />
-              </div>
-              <h3 className="font-bold text-white text-sm">Conductor Manifests</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Real-time boarding passes, seat occupancy percentages, and 1-click boarding check-in for bus drivers and station controllers.
-              </p>
-            </div>
-          </div>
+          ))}
         </div>
       </section>
     </div>

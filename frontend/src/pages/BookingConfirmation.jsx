@@ -1,11 +1,10 @@
 import React from 'react';
-import { useLocation, useNavigate, Link } from 'react-router-dom';
-import { CheckCircle2, Ticket, ArrowLeft, Download, ShieldCheck, Bus } from 'lucide-react';
+import { useLocation, Link } from 'react-router-dom';
+import { CheckCircle2, Ticket } from 'lucide-react';
 import TicketCard from '../components/TicketCard';
 
 export default function BookingConfirmation() {
   const location = useLocation();
-  const navigate = useNavigate();
   const booking = location.state?.booking;
 
   if (!booking) {
@@ -27,15 +26,15 @@ export default function BookingConfirmation() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
       {/* Confirmation Success Header */}
-      <div className="bg-emerald-50/80 border border-emerald-200 rounded-2xl p-6 sm:p-8 text-center space-y-3 no-print">
-        <div className="w-12 h-12 bg-emerald-600 text-white rounded-xl flex items-center justify-center mx-auto shadow-md shadow-emerald-600/20">
+      <div className="rounded-3xl border border-emerald-200 bg-emerald-50/80 p-6 text-center shadow-sm sm:p-8 no-print">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-600 text-white shadow-md shadow-emerald-600/20">
           <CheckCircle2 className="w-7 h-7" />
         </div>
         <h1 className="text-2xl sm:text-3xl font-extrabold text-emerald-950 tracking-tight">
-          Booking Confirmed & Seats Exclusively Locked!
+          Your trip is booked
         </h1>
         <p className="text-xs sm:text-sm text-emerald-800 max-w-xl mx-auto leading-relaxed">
-          Your transaction is committed with row-level exclusivity. Your official PNR reference is{' '}
+          Your booking is confirmed. Keep this reference handy:{' '}
           <strong className="font-mono bg-emerald-200/60 px-2 py-0.5 rounded text-emerald-950">
             {booking.pnr}
           </strong>
@@ -65,7 +64,7 @@ export default function BookingConfirmation() {
             Generated Boarding Pass
           </div>
           <span className="text-xs text-slate-500">
-            SMS & E-ticket dispatched to <strong className="text-slate-800">{booking.contact_email}</strong>
+            Booking reference <strong className="text-slate-800">{booking.pnr}</strong>
           </span>
         </div>
 

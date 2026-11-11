@@ -1,8 +1,6 @@
 import React from 'react';
 import {
-  Bus, MapPin, Calendar, Clock, User, CheckCircle2,
-  XCircle, Printer, QrCode, ShieldCheck, AlertCircle,
-  Luggage, Info, Shield, Check
+  Bus, MapPin, Clock, CheckCircle2, XCircle, Printer, ShieldCheck, Luggage
 } from 'lucide-react';
 
 export default function TicketCard({ booking, onCancelClick }) {
@@ -33,7 +31,7 @@ export default function TicketCard({ booking, onCancelClick }) {
               Electronic Boarding Pass
             </div>
             <h2 className="text-xl font-extrabold text-white tracking-tight">
-              {booking.operator_name || 'NexBus Premier Travels'}
+              {booking.operator_name || 'Your bus operator'}
             </h2>
             <div className="text-xs text-slate-300 font-medium">
               {booking.bus_model} (<span className="font-mono text-white font-semibold">{booking.bus_number}</span>)
@@ -113,7 +111,7 @@ export default function TicketCard({ booking, onCancelClick }) {
         {/* Passenger Manifest Table */}
         <div>
           <h3 className="text-xs font-extrabold text-slate-900 uppercase tracking-wider mb-3">
-            Confirmed Passenger Manifest ({booking.passengers?.length || 0})
+            Passenger details ({booking.passengers?.length || 0})
           </h3>
           <div className="overflow-x-auto rounded-xl border border-slate-200">
             <table className="w-full text-left text-xs">
@@ -164,10 +162,10 @@ export default function TicketCard({ booking, onCancelClick }) {
             <div className="text-right">
               <div className="text-slate-500 font-medium">Refund Amount Processed</div>
               <div className="text-xl font-black text-emerald-600 font-mono">
-                ₹{Math.round(booking.refund_amount || 0)}
+                ₹{Math.round(booking.refunds?.[0]?.refund_amount || booking.refund_amount || 0)}
               </div>
               <div className="text-[10px] text-slate-400 font-mono">
-                Deduction Fee: ₹{Math.round(booking.cancellation_fee || 0)}
+                Deduction Fee: ₹{Math.round(booking.refunds?.[0]?.cancellation_fee || booking.cancellation_fee || 0)}
               </div>
             </div>
           )}
@@ -190,7 +188,7 @@ export default function TicketCard({ booking, onCancelClick }) {
       <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 no-print">
         <div className="text-xs text-slate-500 flex items-center gap-1.5 font-medium">
           <ShieldCheck className="w-4 h-4 text-emerald-600" />
-          <span>Official Conductor Verified M-Ticket</span>
+          <span>Keep this ticket available when you board</span>
         </div>
 
         <div className="flex items-center gap-2">
