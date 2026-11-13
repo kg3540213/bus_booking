@@ -404,7 +404,24 @@ For complete schema definitions, index strategies, and field constraints, see [E
 
 ## 🔌 API Endpoint Reference
 
-All endpoints are documented with interactive request/response models in the OpenAPI Swagger UI at `http://localhost:5000/api/docs`.
+All backend endpoints are documented with interactive request/response models in the OpenAPI Swagger UI at `http://localhost:5000/api/docs`; the raw OpenAPI JSON is available at `http://localhost:5000/api/docs.json`. Use the Authorize button to provide a JWT for protected operations.
+
+### System
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/health` | Public | Check API service health. |
+
+### Operators, Buses & Routes
+| Method | Endpoint | Access | Description |
+| :--- | :--- | :--- | :--- |
+| `GET` | `/api/operators` and `/api/operators/:id` | Public | Browse operators and operator details. |
+| `POST` | `/api/operators` | Admin | Create an operator. |
+| `PUT` | `/api/operators/:id` | Admin/Operator | Update an operator (operators may update their own record). |
+| `GET` | `/api/buses` and `/api/buses/:id` | Public | Browse buses and their seat layouts. |
+| `POST` | `/api/buses` | Admin/Operator | Add a bus and generate its seat layout. |
+| `GET` | `/api/routes/cities` and `/api/routes` | Public | Browse active-route cities and routes. |
+| `GET` | `/api/routes/:id` | Public | Retrieve route details and stops. |
+| `POST` | `/api/routes` | Admin/Operator | Create a route and its optional stops. |
 
 ### Authentication (`/api/auth`)
 | Method | Endpoint | Access | Description |
@@ -419,14 +436,15 @@ All endpoints are documented with interactive request/response models in the Ope
 | :--- | :--- | :--- | :--- |
 | `GET` | `/api/trips/search` | Public | Search available trips by origin, destination, date, bus type, and time of day. |
 | `GET` | `/api/trips/:id` | Public | Retrieve trip details with live seat availability matrix and stop sequence. |
-| `POST` | `/api/trips` | Admin Only | Schedule a new bus departure run. |
+| `POST` | `/api/trips` | Admin/Operator | Schedule a new bus departure run. |
+| `PATCH` | `/api/trips/:id/status` | Admin/Operator | Update a trip's operating status. |
 
 ### Bookings & Ticketing (`/api/bookings`)
 | Method | Endpoint | Access | Description |
 | :--- | :--- | :--- | :--- |
-| `POST` | `/api/bookings` | Public/Auth | Create booking with transactional row-level seat locking. |
+| `POST` | `/api/bookings` | Authenticated | Create booking with transactional row-level seat locking. |
 | `GET` | `/api/bookings/pnr/:pnr` | Public | Retrieve electronic boarding pass and verified passenger details by PNR. |
-| `GET` | `/api/bookings/my` | Authenticated | Retrieve booking history for the logged-in passenger. |
+| `GET` | `/api/bookings/my-bookings` | Authenticated | Retrieve booking history for the logged-in user. |
 | `GET` | `/api/bookings/:id/cancellation-quote` | Authenticated | Calculate live cancellation refund quote based on hours until departure. |
 | `POST` | `/api/bookings/:id/cancel` | Authenticated | Cancel confirmed booking, release seats, and record refund ledger entry. |
 

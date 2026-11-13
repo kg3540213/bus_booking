@@ -37,7 +37,11 @@ app.get('/api/health', (req, res) => {
 });
 
 // Interactive Swagger UI
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc));
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDoc, {
+  explorer: true,
+  persistAuthorization: true,
+  displayRequestDuration: true,
+}));
 app.get('/api/docs.json', (req, res) => res.json(swaggerDoc));
 
 // Mount Modules
