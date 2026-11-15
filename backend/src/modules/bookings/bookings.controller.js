@@ -1,8 +1,11 @@
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 const { z } = require('zod');
 const { pool } = require('../../config/db');
 const { generatePNR } = require('../../utils/pnrGenerator');
 const { calculateCancellationRefund } = require('../../utils/cancellationCalc');
 const { logAuditTrail } = require('../../middleware/auditLogger');
+const { signToken } = require('../auth/auth.controller');
 
 const passengerSchema = z.preprocess((val) => {
   if (typeof val !== 'object' || val === null) return val;
@@ -64,7 +67,7 @@ async function createBooking(req, res, next) {
   const client = await pool.connect();
   try {
     const parsed = createBookingSchema.parse(req.body);
-    const userId = req.user.id;
+    let userId = req.user?.id;
 
     // 1. Check idempotency if key provided
     if (parsed.idempotency_key) {
@@ -84,7 +87,30 @@ async function createBooking(req, res, next) {
 
     await client.query('BEGIN');
 
-    // 2. Verify trip exists and is active
+    // 2. Resolve user: from JWT claims or create/find guest customer
+    if (!userId) {
+      const emailLower = parsed.primary_contact_email.toLowerCase().trim();
+      const userRes = await client.query('SELECT id, name, email, role FROM users WHERE email = $1', [emailLower]);
+      if (userRes.rows.length > 0) {
+        await client.query('ROLLBACK');
+        return res.status(409).json({
+          success: false,
+          error: 'An account with this email already exists. Please sign in to book.',
+        });
+      }
+
+      const randomPassword = crypto.randomBytes(32).toString('hex');
+      const passwordHash = await bcrypt.hash(randomPassword, 10);
+      const newRes = await client.query(
+        `INSERT INTO users (name, email, password_hash, phone, role)
+         VALUES ($1, $2, $3, $4, 'CUSTOMER')
+         RETURNING id`,
+        [parsed.primary_contact_name, emailLower, passwordHash, parsed.primary_contact_phone]
+      );
+      userId = newRes.rows[0].id;
+    }
+
+    // 3. Verify trip exists and is active
     const tripRes = await client.query(
       `SELECT t.*, r.source_city, r.destination_city
        FROM trips t

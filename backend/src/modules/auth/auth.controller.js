@@ -223,4 +223,4 @@ async function demoLogin(req, res, next) {
   }
 }
 
-module.exports = { register, login, getProfile, demoLogin };
+module.exports = { register, login, getProfile, demoLogin, signToken };

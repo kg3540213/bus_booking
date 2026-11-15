@@ -99,6 +99,42 @@ describe('NexBus Enterprise Transit System - Acceptance Test Suite', () => {
     createdPNR = bookRes.body.data.pnr;
   });
 
+  test('Guest can book a seat without an authentication token', async () => {
+    const tripDetailRes = await request(app).get(`/api/trips/${targetTripId}`);
+    const availableSeat = tripDetailRes.body.data.seats.find(s => s.status === 'AVAILABLE');
+    expect(availableSeat).toBeDefined();
+
+    let guestBookingId;
+    try {
+      const bookingRes = await request(app)
+        .post('/api/bookings')
+        .send({
+          trip_id: targetTripId,
+          selected_seats: [availableSeat.seat_number],
+          passengers: [{
+            seat_number: availableSeat.seat_number,
+            passenger_name: 'Guest Passenger',
+            passenger_age: 29,
+            passenger_gender: 'OTHER',
+          }],
+          primary_contact_name: 'Guest Passenger',
+          primary_contact_email: `guest-${Date.now()}@example.com`,
+          primary_contact_phone: '+91 98888 11111',
+        });
+
+      expect(bookingRes.status).toBe(201);
+      expect(bookingRes.body.success).toBe(true);
+      expect(bookingRes.body.data.status).toBe('CONFIRMED');
+      guestBookingId = bookingRes.body.data.id;
+    } finally {
+      if (guestBookingId) {
+        await request(app)
+          .post(`/api/bookings/${guestBookingId}/cancel`)
+          .set('Authorization', `Bearer ${adminToken}`);
+      }
+    }
+  });
+
   // Acceptance Test 2: Concurrency & Seat Integrity (Simultaneous booking requests)
   test('Acceptance Test 2: Two users cannot confirm the same seat on one trip (Concurrency & Seat Integrity)', async () => {
     // Pick an available seat for conflict testing

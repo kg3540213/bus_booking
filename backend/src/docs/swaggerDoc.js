@@ -685,9 +685,9 @@ const swaggerDoc = {
       post: {
         operationId: 'createBooking',
         summary: 'Book selected seats with transactional locking',
-        description: 'Requires an authenticated user. Seat rows are locked during booking to prevent concurrent double-booking. Reusing an idempotency key returns the existing booking.',
+        description: 'Authentication is optional. Guest bookings use the contact email to create a customer record; an existing account requires sign-in. Seat rows are locked during booking to prevent concurrent double-booking. Reusing an idempotency key returns the existing booking.',
         tags: ['Bookings'],
-        security: [{ bearerAuth: [] }],
+        security: [{}, { bearerAuth: [] }],
         requestBody: {
           required: true,
           content: { 'application/json': { schema: { $ref: '#/components/schemas/BookingRequest' } } },
@@ -696,7 +696,6 @@ const swaggerDoc = {
           201: dataResponse('Booking confirmed with PNR', { $ref: '#/components/schemas/Booking' }),
           200: dataResponse('Existing booking returned for idempotency key', { $ref: '#/components/schemas/Booking' }),
           400: errorResponse('Invalid booking, seat selection, or trip status'),
-          401: errorResponse('Authentication is required'),
           404: errorResponse('Trip not found'),
           409: errorResponse('Selected seat is already booked'),
         },
