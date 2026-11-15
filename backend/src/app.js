@@ -16,19 +16,63 @@ const reportsRoutes = require('./modules/reports/reports.routes');
 const auditRoutes = require('./modules/audit/audit.routes');
 
 const app = express();
-const clientUrl = process.env.CLIENT_URL
-  ? process.env.CLIENT_URL.replace(/\/+$/, '')
-  : '*';
+const configuredOrigins = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.split(',').map((url) => url.trim().replace(/\/+$/, ''))
+  : ['*'];
 
 // Global Middlewares
 app.use(cors({
-  origin: clientUrl,
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (configuredOrigins.includes('*') || configuredOrigins.includes(origin)) {
+      return callback(null, origin);
+    }
+    if (/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin)) {
+      return callback(null, origin);
+    }
+    if (/^https:\/\/.*\.vercel\.app$/.test(origin)) {
+      return callback(null, origin);
+    }
+    return callback(null, configuredOrigins[0] || false);
+  },
   credentials: true,
 }));
 app.use(express.json());
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
+
+// Root status / API entrypoint
+app.get('/', (req, res) => {
+  res.json({
+    status: 'healthy',
+    message: 'Bus Booking Management System API is operational',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/api/health',
+      docs: '/api/docs',
+      docsJson: '/api/docs.json',
+      auth: '/api/auth',
+      trips: '/api/trips',
+      bookings: '/api/bookings',
+      buses: '/api/buses',
+      routes: '/api/routes',
+      operators: '/api/operators',
+      reports: '/api/reports',
+      audit: '/api/audit',
+    },
+  });
+});
+
+// Root-level health check endpoint (pinged by cloud uptime monitors)
+app.get('/health', (req, res) => {
+  res.json({
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    service: 'Bus Booking Management System API',
+  });
+});
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

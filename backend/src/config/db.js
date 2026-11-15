@@ -1,17 +1,41 @@
 const { Pool } = require('pg');
 const dotenv = require('dotenv');
+const path = require('path');
 
+// Load environment variables from backend/.env or root .env
+dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
+dotenv.config({ path: path.resolve(__dirname, '../../.env') });
 dotenv.config();
 
-const connectionConfig = process.env.DATABASE_URL
-  ? { connectionString: process.env.DATABASE_URL }
+let connectionString = process.env.DATABASE_URL;
+
+// When running locally outside of Render, internal Render hostname (dpg-*-a)
+// resolves via the external domain suffix (.oregon-postgres.render.com)
+if (connectionString && process.env.RENDER !== 'true') {
+  connectionString = connectionString.replace(
+    /@(dpg-[a-z0-9]+-a)(?::\d+)?\//,
+    '@$1.oregon-postgres.render.com/'
+  );
+}
+
+const isRemoteDb = Boolean(
+  connectionString &&
+  !connectionString.includes('localhost') &&
+  !connectionString.includes('127.0.0.1')
+);
+
+const connectionConfig = connectionString
+  ? {
+      connectionString,
+      ...(isRemoteDb ? { ssl: { rejectUnauthorized: false } } : {}),
+    }
   : {
-    host: process.env.DB_HOST || 'localhost',
-    port: parseInt(process.env.DB_PORT || '5432', 10),
-    user: process.env.DB_USER || 'bus_admin',
-    password: process.env.DB_PASSWORD || 'bus_secure_pass',
-    database: process.env.DB_NAME || 'bus_booking_db',
-  };
+      host: process.env.DB_HOST || 'localhost',
+      port: parseInt(process.env.DB_PORT || '5432', 10),
+      user: process.env.DB_USER || 'bus_admin',
+      password: process.env.DB_PASSWORD || 'bus_secure_pass',
+      database: process.env.DB_NAME || 'bus_booking_db',
+    };
 
 const pool = new Pool({
   ...connectionConfig,
@@ -29,3 +53,4 @@ module.exports = {
   getClient: () => pool.connect(),
   pool,
 };
+
