@@ -257,7 +257,7 @@ $$\Delta t = \frac{\text{Departure Time} - \text{Current Time}}{\text{3600 secon
 
 ## 🚀 Quick Start & Docker Deployment
 
-### Option 1: Docker Compose (Zero Configuration)
+### Option 1: Docker Compose
 
 Ensure Docker Desktop is running:
 
@@ -266,9 +266,20 @@ Ensure Docker Desktop is running:
 git clone <repo-url>
 cd bus_booking
 
-# 2. Build and launch all 3 containers
+# 2. Start PostgreSQL
+docker-compose up -d postgres
+
+# 3. Initialize a new, empty local database once
+docker-compose run --rm backend npm run db:migrate
+docker-compose run --rm backend npm run db:seed
+
+# 4. Build and launch the application
 docker-compose up --build -d
 ```
+
+The migration drops and recreates tables. Run it only against a new, empty database;
+it will delete existing data. The backend container does not run migrations or seeding
+automatically on startup.
 
 #### Application Endpoints:
 - **Frontend Web Application**: [http://localhost:3000](http://localhost:3000)
@@ -464,24 +475,29 @@ All backend endpoints are documented with interactive request/response models in
 
 ## ⚙️ Environment Configuration
 
-Environment variables can be customized in `.env`:
+Set these variables in the backend hosting provider's environment settings. Keep database
+credentials and signing secrets out of source control. Use the provider's internal database
+URL when the backend runs on the same provider/network; otherwise use its external URL.
 
 ```env
-# Database Settings
-DB_HOST=postgres
-DB_PORT=5432
-DB_USER=bus_admin
-DB_PASSWORD=bus_secure_pass
-DB_NAME=bus_booking_db
+# Production database (use the full URL supplied by your database provider)
+DATABASE_URL=postgresql://<user>:<password>@<host>:<port>/<database>
 
-# Server Settings
-PORT=5000
+# Backend settings
 NODE_ENV=production
-CLIENT_URL=http://localhost:3000
-
-# Security Credentials
-JWT_SECRET=nexbus_jwt_secure_key_2026_enterprise
+CLIENT_URL=https://<your-frontend-domain>
+JWT_SECRET=<generate-a-long-random-secret>
 JWT_EXPIRES_IN=24h
+```
+
+For local development, omit `DATABASE_URL` to use the `DB_HOST`, `DB_PORT`, `DB_USER`,
+`DB_PASSWORD`, and `DB_NAME` settings. The hosting platform normally supplies `PORT`
+automatically; set it locally only if needed.
+
+Generate a signing secret locally, for example with:
+
+```powershell
+node -e "console.log(require('crypto').randomBytes(32).toString('base64'))"
 ```
 
 ---

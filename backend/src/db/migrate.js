@@ -7,18 +7,31 @@ async function runMigration() {
   const sql = fs.readFileSync(schemaPath, 'utf8');
 
   console.log('Running database schema migration...');
-  const client = await pool.connect();
+  let client;
+  let transactionStarted = false;
+
   try {
+    client = await pool.connect();
     await client.query('BEGIN');
+    transactionStarted = true;
     await client.query(sql);
     await client.query('COMMIT');
+    transactionStarted = false;
     console.log('Database schema migration completed successfully!');
   } catch (err) {
-    await client.query('ROLLBACK');
+    if (client && transactionStarted) {
+      try {
+        await client.query('ROLLBACK');
+      } catch (rollbackError) {
+        console.error('Migration rollback failed:', rollbackError);
+      }
+    }
     console.error('Migration failed:', err);
     throw err;
   } finally {
-    client.release();
+    if (client) {
+      client.release();
+    }
   }
 }
 
