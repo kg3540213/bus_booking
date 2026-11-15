@@ -16,10 +16,13 @@ const reportsRoutes = require('./modules/reports/reports.routes');
 const auditRoutes = require('./modules/audit/audit.routes');
 
 const app = express();
+const clientUrl = process.env.CLIENT_URL
+  ? process.env.CLIENT_URL.replace(/\/+$/, '')
+  : '*';
 
 // Global Middlewares
 app.use(cors({
-  origin: process.env.CLIENT_URL || '*',
+  origin: clientUrl,
   credentials: true,
 }));
 app.use(express.json());
