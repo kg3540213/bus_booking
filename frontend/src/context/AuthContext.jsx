@@ -4,11 +4,12 @@ import { authApi } from '../services/api';
 const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
+  const [token, setToken] = useState(() => localStorage.getItem('nexbus_token'));
   const [user, setUser] = useState(() => {
+    if (!localStorage.getItem('nexbus_token')) return null;
     const saved = localStorage.getItem('nexbus_user');
     return saved ? JSON.parse(saved) : null;
   });
-  const [token, setToken] = useState(() => localStorage.getItem('nexbus_token'));
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,6 +26,8 @@ export function AuthProvider({ children }) {
         })
         .finally(() => setLoading(false));
     } else {
+      setUser(null);
+      localStorage.removeItem('nexbus_user');
       setLoading(false);
     }
   }, [token]);

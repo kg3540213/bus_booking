@@ -74,7 +74,7 @@ export default function BookingCheckout() {
   // Primary Contact Info
   const [contactName, setContactName] = useState(user?.name || "John Doe");
   const [contactEmail, setContactEmail] = useState(
-    user?.email || "user@example.com",
+    user?.email || "",
   );
   const [contactPhone, setContactPhone] = useState(
     user?.phone || "+91 98765 43210",
@@ -134,7 +134,7 @@ export default function BookingCheckout() {
       const primaryEmail = (
         contactEmail ||
         user?.email ||
-        "user@example.com"
+        ""
       ).trim();
       const primaryPhone = (
         contactPhone ||
@@ -179,11 +179,10 @@ export default function BookingCheckout() {
       }
     } catch (err) {
       console.error("Booking submission error:", err);
-      const is409 =
-        err.status === 409 ||
-        err.message?.toLowerCase().includes("already booked") ||
-        err.message?.toLowerCase().includes("collision");
-      setIsCollisionError(is409);
+      const isSeatCollision =
+        err.data?.error?.startsWith("Seat collision:") ||
+        (Array.isArray(err.data?.booked_seats) && err.data.booked_seats.length > 0);
+      setIsCollisionError(isSeatCollision);
 
       let msg =
         err.message ||
@@ -204,7 +203,7 @@ export default function BookingCheckout() {
         }
       } catch (_) {}
 
-      if (is409) {
+      if (isSeatCollision) {
         msg =
           "One or more of your selected berths were just confirmed by another passenger during checkout. Please return to the seat map and select another available berth.";
       }
