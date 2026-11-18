@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { ArrowRight, BookOpen, BusFront, ChevronDown, LayoutDashboard, LogOut, Shield, Ticket, UserRound } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
@@ -8,6 +8,18 @@ export default function Navbar() {
   const { user, logout, demoLogin, isAdmin, isOperator } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const demoMenuRef = useRef(null);
+
+  useEffect(() => {
+    const closeDemoMenu = (event) => {
+      if (demoMenuRef.current && !demoMenuRef.current.contains(event.target)) {
+        demoMenuRef.current.open = false;
+      }
+    };
+
+    document.addEventListener('pointerdown', closeDemoMenu);
+    return () => document.removeEventListener('pointerdown', closeDemoMenu);
+  }, []);
 
   const switchDemoRole = async (role) => {
     try {
@@ -64,7 +76,7 @@ export default function Navbar() {
         </nav>
 
         <div className="flex shrink-0 items-center gap-2">
-          <details className="group relative hidden sm:block">
+          <details ref={demoMenuRef} className="group relative hidden sm:block">
             <summary className="flex cursor-pointer list-none items-center gap-1.5 rounded-lg px-2.5 py-2 text-xs font-medium text-slate-500 transition hover:bg-slate-50 hover:text-slate-900">
               Demo access <ChevronDown className="h-3.5 w-3.5 transition group-open:rotate-180" />
             </summary>
@@ -78,7 +90,10 @@ export default function Navbar() {
                 <button
                   key={role}
                   type="button"
-                  onClick={() => switchDemoRole(role)}
+                  onClick={() => {
+                    demoMenuRef.current.open = false;
+                    switchDemoRole(role);
+                  }}
                   className="w-full rounded-xl px-2.5 py-2 text-left text-sm font-medium text-slate-700 transition hover:bg-slate-50 hover:text-brand-700"
                 >
                   {label}
